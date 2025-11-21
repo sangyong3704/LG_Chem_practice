@@ -358,6 +358,63 @@
                     </header>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- News Section (New) -->
+                        <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                            <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
+                                <i data-lucide="newspaper" width="18" class="mr-2 text-orange-500"></i>
+                                🌞 모닝 AI 브리핑 (산업 뉴스 & 키워드)
+                            </h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- News List -->
+                                <div class="space-y-3">
+                                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors">
+                                        <div class="flex items-center mb-1">
+                                            <span class="text-[10px] font-bold bg-white border border-slate-200 px-1.5 py-0.5 rounded text-sub mr-2">경쟁사 동향</span>
+                                            <h4 class="text-sm font-bold text-slate-800 truncate">글로벌 배터리 시장, 전고체 기술 경쟁 심화</h4>
+                                        </div>
+                                        <p class="text-xs text-slate-600 leading-relaxed line-clamp-2">주요 경쟁사들이 2027년 양산을 목표로 R&D 투자를 15% 확대했습니다. 차세대 라인 선점이 관건입니다.</p>
+                                    </div>
+                                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors">
+                                        <div class="flex items-center mb-1">
+                                            <span class="text-[10px] font-bold bg-white border border-slate-200 px-1.5 py-0.5 rounded text-sub mr-2">기술 트렌드</span>
+                                            <h4 class="text-sm font-bold text-slate-800 truncate">생성형 AI, 제조업 공정 효율 30% 개선 사례</h4>
+                                        </div>
+                                        <p class="text-xs text-slate-600 leading-relaxed line-clamp-2">스마트 팩토리 도입 기업들의 데이터 분석 시간이 획기적으로 단축되었습니다. 도입 검토가 시급합니다.</p>
+                                    </div>
+                                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors">
+                                        <div class="flex items-center mb-1">
+                                            <span class="text-[10px] font-bold bg-white border border-slate-200 px-1.5 py-0.5 rounded text-sub mr-2">규제/정책</span>
+                                            <h4 class="text-sm font-bold text-slate-800 truncate">ESG 공시 의무화, 공급망 관리 비상</h4>
+                                        </div>
+                                        <p class="text-xs text-slate-600 leading-relaxed line-clamp-2">협력사 탄소 배출량 데이터 확보가 필수 과제로 떠올랐습니다. 구매팀과 연계한 대응 전략이 필요합니다.</p>
+                                    </div>
+                                </div>
+                                
+                                <!-- Keywords & Chart Placeholder -->
+                                <div class="flex flex-col">
+                                    <div class="mb-4">
+                                        <h4 class="text-xs font-bold text-sub mb-2 flex items-center">
+                                            <i data-lucide="trending-up" width="14" class="mr-1"></i> 실시간 트렌드 키워드
+                                        </h4>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer">#전고체배터리</span>
+                                            <span class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer">#DX가속화</span>
+                                            <span class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer">#탄소국경세</span>
+                                            <span class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer">#애자일조직</span>
+                                            <span class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer">#생성형AI</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex-1 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center p-4">
+                                        <div class="text-center">
+                                            <i data-lucide="bar-chart-3" width="24" class="mx-auto text-slate-300 mb-2"></i>
+                                            <p class="text-xs text-slate-400">키워드 언급량 분석 차트<br/>(데이터 수집 중...)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Document Summarizer -->
                         <div class="lg:col-span-2 space-y-6">
                             <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                                 <h3 class="font-semibold text-slate-700 mb-4 flex items-center justify-between">
