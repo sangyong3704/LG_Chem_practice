@@ -358,7 +358,7 @@
                     </header>
 
                     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- News Section (New) -->
+                        <!-- News Section -->
                         <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-slate-100 p-6">
                             <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
                                 <i data-lucide="newspaper" width="18" class="mr-2 text-orange-500"></i>
@@ -535,26 +535,15 @@
         // --- Functions ---
 
         function getPuppySVG(emotion = 'happy', size = 40) {
-            const colors = { fur: '#E8C59C', ears: '#8B5A2B', tongue: '#FF6B6B' };
-            let extras = '';
-            if(emotion === 'smart') {
-                extras = `<g opacity="0.8"><circle cx="38" cy="50" r="8" stroke="#333" stroke-width="2" fill="none"/><circle cx="62" cy="50" r="8" stroke="#333" stroke-width="2" fill="none"/><line x1="46" y1="50" x2="54" y2="50" stroke="#333" stroke-width="2"/></g>`;
-            } else if(emotion === 'sleepy') {
-                extras = `<g><path d="M34 48 Q38 52 42 48" stroke="#333" stroke-width="2" fill="none" /><path d="M58 48 Q62 52 66 48" stroke="#333" stroke-width="2" fill="none" /><text x="75" y="30" font-size="20" fill="#5C3D1E">zZ</text></g>`;
-            } else if(emotion === 'happy') {
-                 extras = `<path d="M46 68Q50 78 54 68" fill="${colors.tongue}" stroke="#333" stroke-width="1"/>`;
+            // Removed SVG logic, replaced with simple Emoji
+            const fontSize = Math.max(20, size * 0.8); 
+            let emoji = '🐶';
+            
+            if (emotion === 'sleepy') {
+               emoji = '🐶'; 
             }
-
-            return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20 35C20 35 10 50 15 60C20 70 30 45 30 45" fill="${colors.ears}" stroke="#5C3D1E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M80 35C80 35 90 50 85 60C80 70 70 45 70 45" fill="${colors.ears}" stroke="#5C3D1E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="50" cy="55" r="35" fill="${colors.fur}" stroke="#5C3D1E" stroke-width="3"/>
-                <circle cx="38" cy="50" r="4" fill="#333"/>
-                <circle cx="62" cy="50" r="4" fill="#333"/>
-                <ellipse cx="50" cy="60" rx="6" ry="4" fill="#333"/>
-                <path d="M45 65Q50 70 55 65" stroke="#333" stroke-width="2" stroke-linecap="round"/>
-                ${extras}
-            </svg>`;
+            
+            return `<div style="font-size: ${fontSize}px; line-height: 1; display: flex; justify-content: center; align-items: center; cursor: default;">${emoji}</div>`;
         }
 
         function switchTab(tabName) {
