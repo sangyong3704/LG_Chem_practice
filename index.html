@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Leadership Balancer - B조세계최고</title>
     
-    <!-- Tailwind CSS (스타일링) -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Lucide Icons (아이콘) -->
+    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <!-- Custom Colors Configuration -->
@@ -32,7 +32,7 @@
             font-family: 'Pretendard', sans-serif;
         }
 
-        /* 스크롤바 커스텀 */
+        /* Scrollbar Custom */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -106,9 +106,7 @@
                 </div>
                 
                 <div class="flex items-center space-x-3">
-                   <!-- Mascot SVG Small -->
                    <div id="mascot-small"></div>
-                   
                    <div class="flex-1">
                       <div class="flex items-end space-x-2 mb-1">
                         <span class="text-2xl font-bold text-green-400">85%</span>
@@ -144,12 +142,9 @@
                 
                 <!-- 1. Dashboard View -->
                 <div id="view-dashboard" class="fade-in space-y-6">
-                    <!-- Header -->
                     <header class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-100">
                         <div class="flex items-center space-x-4">
-                            <div class="bg-yellow-100 p-2 rounded-full" id="mascot-dashboard">
-                                <!-- Mascot injected via JS -->
-                            </div>
+                            <div class="bg-yellow-100 p-2 rounded-full" id="mascot-dashboard"></div>
                             <div>
                                 <h2 class="text-2xl font-bold text-slate-800">B조세계최고 리더님, 반가워요! 🐾</h2>
                                 <p class="text-sm text-sub mt-1">AI 팩트 시트와 골든타임 알림으로 오늘도 팀을 완벽하게 케어해볼까요?</p>
@@ -160,7 +155,6 @@
 
                     <!-- KPI Cards -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <!-- Fairness Card -->
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-main/10 text-main rounded-lg">
@@ -169,19 +163,18 @@
                                 <span class="text-xs font-medium text-sub bg-slate-100 px-2 py-1 rounded">업데이트 필요</span>
                             </div>
                             <h3 class="text-lg font-semibold text-slate-700 mb-1">성과 객관화</h3>
-                            <p class="text-sm text-sub">3명의 팀원에 대한<br/>난이도 보정 데이터가 있습니다.</p>
+                            <p class="text-sm text-sub">4명의 팀원에 대한<br/>난이도 보정 데이터가 있습니다.</p>
                             <button onclick="switchTab('fairness')" class="mt-4 text-sm text-main font-medium flex items-center hover:underline">
                                 확인하기 <i data-lucide="chevron-right" width="16" class="ml-1"></i>
                             </button>
                         </div>
 
-                        <!-- Relationship Card -->
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-pink-50 text-pink-600 rounded-lg">
                                     <i data-lucide="message-circle-heart" width="24"></i>
                                 </div>
-                                <span class="text-xs font-medium text-pink-600 bg-pink-50 px-2 py-1 rounded animate-pulse">2건 대기중</span>
+                                <span class="text-xs font-medium text-pink-600 bg-pink-50 px-2 py-1 rounded animate-pulse">4건 대기중</span>
                             </div>
                             <h3 class="text-lg font-semibold text-slate-700 mb-1">피드백 골든타임</h3>
                             <p class="text-sm text-sub">칭찬 타이밍을 놓치지 마세요.<br/>지금 메시지를 보내보세요.</p>
@@ -190,7 +183,6 @@
                             </button>
                         </div>
 
-                        <!-- Time Card -->
                         <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
@@ -236,21 +228,21 @@
                                         <span class="text-xs text-sub">10분 전</span>
                                     </div>
                                     <p class="text-sm text-slate-600 mb-2"><strong>하유림</strong>님이 예정보다 2일 빠르게 핵심 난제를 해결했습니다. 칭찬할 골든타임입니다!</p>
-                                    <button onclick="switchTab('relationship')" class="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm hover:bg-slate-50 text-sub font-medium">AI 초안 보기</button>
+                                    <button onclick="setFeedbackTarget('하유림'); switchTab('relationship');" class="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm hover:bg-slate-50 text-sub font-medium">AI 초안 보기</button>
                                 </div>
                             </div>
                             
                             <div class="flex items-start space-x-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                                <div class="mt-1 p-2 rounded-full bg-yellow-100 text-yellow-600">
-                                    <i data-lucide="alert-triangle" width="18"></i>
+                                <div class="mt-1 p-2 rounded-full bg-green-100 text-green-600">
+                                    <i data-lucide="check-circle-2" width="18"></i>
                                 </div>
                                 <div class="flex-1">
                                     <div class="flex justify-between items-center mb-1">
-                                        <h4 class="font-semibold text-slate-800">이슈 감지</h4>
-                                        <span class="text-xs text-sub">1시간 전</span>
+                                        <h4 class="font-semibold text-slate-800">리더십 격려</h4>
+                                        <span class="text-xs text-sub">2시간 전</span>
                                     </div>
-                                    <p class="text-sm text-slate-600 mb-2">경영진 목표 변경(Q3 KPI 수정)에 따른 영향도 분석이 완료되었습니다.</p>
-                                    <button onclick="switchTab('time')" class="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm hover:bg-slate-50 text-sub font-medium">분석 확인하기</button>
+                                    <p class="text-sm text-slate-600 mb-2"><strong>박태희</strong>님이 전사 발표를 성공적으로 마쳤습니다. 리더십에 대한 격려 메시지를 보내보세요.</p>
+                                    <button onclick="setFeedbackTarget('박태희'); switchTab('relationship');" class="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm hover:bg-slate-50 text-sub font-medium">AI 초안 보기</button>
                                 </div>
                             </div>
                         </div>
@@ -268,15 +260,11 @@
                         <!-- Team List -->
                         <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
                             <h3 class="font-semibold text-slate-700 mb-4 px-2">팀원 목록</h3>
-                            <div class="space-y-2" id="team-list-container">
-                                <!-- JS Generated -->
-                            </div>
+                            <div class="space-y-2" id="team-list-container"></div>
                         </div>
 
                         <!-- Detail View -->
-                        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col" id="fairness-detail">
-                            <!-- JS Generated -->
-                        </div>
+                        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col" id="fairness-detail"></div>
                     </div>
                 </div>
 
@@ -294,8 +282,9 @@
                                 <i data-lucide="bell" width="18" class="mr-2 text-pink-500"></i>
                                 피드백 추천 알림
                             </h3>
-                            <div class="space-y-4">
-                                <div class="p-4 border border-pink-100 bg-pink-50 rounded-lg cursor-pointer ring-2 ring-pink-200" onclick="setFeedbackTarget('하유림')">
+                            <div class="space-y-4 overflow-y-auto max-h-[400px] pr-2">
+                                <!-- Ha Yu-rim -->
+                                <div id="alert-hayurim" class="p-4 border bg-pink-50 border-pink-100 ring-2 ring-pink-200 rounded-lg cursor-pointer transition-all mb-3" onclick="setFeedbackTarget('하유림')">
                                     <div class="flex justify-between items-start mb-2">
                                         <span class="font-bold text-slate-800">하유림 (슈퍼 크랙)</span>
                                         <span class="text-xs text-pink-600 bg-white px-2 py-1 rounded-full font-medium">즉시 칭찬 필요</span>
@@ -303,12 +292,34 @@
                                     <p class="text-sm text-slate-700 mb-3">마감일보다 2일 일찍 업무를 완료했습니다. 지금 칭찬하면 동기부여 효과가 200% 상승합니다.</p>
                                     <div class="text-xs text-sub">발생 시각: 10분 전</div>
                                 </div>
-                                <div class="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer" onclick="setFeedbackTarget('박재현')">
+                                
+                                <!-- Park Tae-hee -->
+                                <div id="alert-parktaehee" class="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer transition-all mb-3" onclick="setFeedbackTarget('박태희')">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="font-bold text-slate-800">박태희 (멋진 팀장님)</span>
+                                        <span class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium">리더십 격려</span>
+                                    </div>
+                                    <p class="text-sm text-slate-700 mb-3">전사 비전 발표를 성공적으로 마쳤습니다. 멋진 리딩에 대해 감사를 표해보세요.</p>
+                                    <div class="text-xs text-sub">발생 시각: 2시간 전</div>
+                                </div>
+
+                                <!-- Park Jeong-ho -->
+                                <div id="alert-parkjeongho" class="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer transition-all mb-3" onclick="setFeedbackTarget('박정호')">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="font-bold text-slate-800">박정호 (우리조 샤크)</span>
+                                        <span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full font-medium">인사이트 인정</span>
+                                    </div>
+                                    <p class="text-sm text-slate-700 mb-3">경쟁사 분석 리포트에서 놀라운 통찰력을 보여주었습니다. 전문성을 인정해 주세요.</p>
+                                    <div class="text-xs text-sub">발생 시각: 4시간 전</div>
+                                </div>
+
+                                <!-- Park Jae-hyun -->
+                                <div id="alert-parkjaehyun" class="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer transition-all" onclick="setFeedbackTarget('박재현')">
                                     <div class="flex justify-between items-start mb-2">
                                         <span class="font-bold text-slate-800">박재현 (분위기 메이커)</span>
-                                        <span class="text-xs text-sub bg-slate-100 px-2 py-1 rounded-full">격려 필요</span>
+                                        <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">분위기 메이커</span>
                                     </div>
-                                    <p class="text-sm text-slate-700 mb-3">팀 이벤트 기획으로 야근 기록이 있습니다. 번아웃 방지를 위해 격려 메시지를 보내보세요.</p>
+                                    <p class="text-sm text-slate-700 mb-3">팀 이벤트 기획으로 고생하셨습니다. 밝은 에너지에 대해 감사를 전하세요.</p>
                                     <div class="text-xs text-sub">발생 시각: 9시간 전</div>
                                 </div>
                             </div>
@@ -420,10 +431,38 @@
     <script>
         // --- Data ---
         const teamMembers = [
-            { id: 1, name: '박재현', role: '우리조 분위기 메이커', effort: 92, result: 85, difficulty: '상', recent: '팀 활력 증진 이벤트 기획' },
-            { id: 2, name: '박태희', role: '멋진 팀장님', effort: 98, result: 99, difficulty: '최상', recent: '전사 비전 수립 및 전파' },
-            { id: 3, name: '박정호', role: '우리조 샤크', effort: 88, result: 80, difficulty: '상', recent: '공격적 시장 진입 전략 수립' },
-            { id: 4, name: '하유림', role: '슈퍼 크랙', effort: 95, result: 96, difficulty: '상', recent: '핵심 난제 해결 및 성과 견인' },
+            { 
+                id: 1, name: '박재현', role: '우리조 분위기 메이커', effort: 92, result: 85, difficulty: '상', recent: '팀 활력 증진 이벤트 기획',
+                detailedTasks: [
+                    { date: '10/20', task: '팀 할로윈 파티 기획안 제출', status: '완료' },
+                    { date: '10/22', task: '워크샵 장소 사전 답사', status: '진행중' },
+                    { date: '10/24', task: '분기별 팀원 인터뷰 정리', status: '대기' }
+                ]
+            },
+            { 
+                id: 2, name: '박태희', role: '멋진 팀장님', effort: 98, result: 99, difficulty: '최상', recent: '전사 비전 수립 및 전파',
+                detailedTasks: [
+                    { date: '10/18', task: '2024 전사 비전 발표 PT 준비', status: '완료' },
+                    { date: '10/23', task: '부서장 회의 안건 발의', status: '완료' },
+                    { date: '10/25', task: '팀 리소스 배분 계획 수정', status: '진행중' }
+                ]
+            },
+            { 
+                id: 3, name: '박정호', role: '우리조 샤크', effort: 88, result: 80, difficulty: '상', recent: '공격적 시장 진입 전략 수립',
+                detailedTasks: [
+                    { date: '10/21', task: '경쟁사 C사 가격 정책 분석', status: '완료' },
+                    { date: '10/22', task: '신규 마켓 진입 시나리오 기획', status: '진행중' },
+                    { date: '10/24', task: '영업팀 전략 공유 미팅', status: '예정' }
+                ]
+            },
+            { 
+                id: 4, name: '하유림', role: '슈퍼 크랙', effort: 95, result: 96, difficulty: '상', recent: '핵심 난제 해결 및 성과 견인',
+                detailedTasks: [
+                    { date: '10/19', task: '레거시 시스템 데이터 마이그레이션', status: '완료' },
+                    { date: '10/21', task: '결제 모듈 성능 이슈 핫픽스', status: '완료' },
+                    { date: '10/23', task: '신규 API 문서화 작업', status: '진행중' }
+                ]
+            },
         ];
 
         const careTips = [
@@ -434,10 +473,10 @@
         ];
 
         let selectedMemberId = 1;
+        let currentFeedbackTarget = '하유림';
 
         // --- Functions ---
 
-        // Mascot SVG Generator
         function getPuppySVG(emotion = 'happy', size = 40) {
             const colors = { fur: '#E8C59C', ears: '#8B5A2B', tongue: '#FF6B6B' };
             let extras = '';
@@ -461,16 +500,12 @@
             </svg>`;
         }
 
-        // Tab Switcher
         function switchTab(tabName) {
-            // Hide all views
             ['dashboard', 'fairness', 'relationship', 'time'].forEach(t => {
                 document.getElementById(`view-${t}`).classList.add('hidden');
             });
-            // Show selected
             document.getElementById(`view-${tabName}`).classList.remove('hidden');
             
-            // Update Sidebar
             const buttons = document.querySelectorAll('.sidebar-item');
             buttons.forEach(btn => {
                 if(btn.textContent.trim().includes(translateTab(tabName))) {
@@ -481,8 +516,6 @@
                     btn.classList.add('text-white/80');
                 }
             });
-
-            // Trigger icons refresh for dynamic content
             lucide.createIcons();
         }
 
@@ -491,7 +524,6 @@
             return map[eng];
         }
 
-        // Fairness Module Logic
         function renderFairness() {
             const listContainer = document.getElementById('team-list-container');
             listContainer.innerHTML = teamMembers.map(m => `
@@ -512,10 +544,21 @@
             const member = teamMembers.find(m => m.id === selectedMemberId);
             const detailContainer = document.getElementById('fairness-detail');
             
-            // Insight text logic
             const insight = member.effort > member.result 
                 ? `${member.name}님은 높은 노력(Process)을 기울였으나, 외부 요인으로 인해 결과(Result) 지표가 다소 낮습니다. 평가 면담 시 이 부분을 충분히 참작했다는 점을 언급하여 억울함을 해소해 주세요. 멍!`
                 : `${member.name}님은 효율적으로 성과를 냈습니다. 다만 팀 내 기여도 측면에서 동료들과의 협업 빈도를 높이도록 코칭하면 더 좋은 리더로 성장할 수 있습니다. 멍!`;
+
+            const detailedTasksHtml = member.detailedTasks.map(task => `
+                <div class="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-lg mb-2">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-xs font-mono text-sub bg-slate-100 px-2 py-1 rounded">${task.date}</span>
+                        <span class="text-sm text-slate-700">${task.task}</span>
+                    </div>
+                    <span class="text-xs font-bold ${task.status === '완료' ? 'text-green-600' : (task.status === '진행중' ? 'text-blue-600' : 'text-slate-400')}">
+                        ${task.status}
+                    </span>
+                </div>
+            `).join('');
 
             detailContainer.innerHTML = `
                 <div class="flex justify-between items-start mb-6">
@@ -528,7 +571,7 @@
                         <div class="text-lg font-bold text-main">${member.difficulty} (High)</div>
                     </div>
                 </div>
-                <div class="grid grid-cols-2 gap-6 mb-8">
+                <div class="grid grid-cols-2 gap-6 mb-6">
                     <div class="bg-slate-50 p-4 rounded-lg">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-medium text-slate-600">기여도 (Effort)</span>
@@ -537,7 +580,6 @@
                         <div class="w-full bg-slate-200 rounded-full h-2.5">
                             <div class="bg-main h-2.5 rounded-full" style="width: ${member.effort}%"></div>
                         </div>
-                        <p class="text-xs text-sub mt-2">야근 시간, 커밋 수 등 기반</p>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-lg">
                         <div class="flex items-center justify-between mb-2">
@@ -547,10 +589,15 @@
                         <div class="w-full bg-slate-200 rounded-full h-2.5">
                             <div class="bg-green-500 h-2.5 rounded-full" style="width: ${member.result}%"></div>
                         </div>
-                        <p class="text-xs text-sub mt-2">KPI 달성률, 품질 기반</p>
                     </div>
                 </div>
-                <div class="bg-main/5 rounded-lg p-5 border border-main/20">
+                <div class="mb-6 bg-slate-50 p-4 rounded-lg">
+                    <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center">
+                        <i data-lucide="list-checks" width="16" class="mr-2"></i>최근 주요 업무 히스토리
+                    </h4>
+                    ${detailedTasksHtml}
+                </div>
+                <div class="bg-main/5 rounded-lg p-5 border border-main/20 mt-auto">
                     <div class="flex items-start space-x-3">
                         <div class="mt-1">${getPuppySVG('smart', 32)}</div>
                         <div>
@@ -568,13 +615,15 @@
             renderFairness();
         }
 
-        // Relationship Logic
         function generateMessage(tone) {
             const area = document.getElementById('message-area');
             const input = document.getElementById('message-input');
             
-            // Loading state
-            input.value = '';
+            // Fix: Check if input exists before accessing value
+            if (input) {
+                input.value = '';
+            }
+
             area.innerHTML = `
                 <div class="absolute inset-0 flex items-center justify-center flex-col">
                     <div class="w-6 h-6 border-2 border-main border-t-transparent rounded-full animate-spin mb-2"></div>
@@ -584,24 +633,69 @@
 
             setTimeout(() => {
                 let text = "";
-                if (tone === 'formal') text = "하유림님, 금번 핵심 난제를 예정보다 빠르게 해결해주신 점 높이 평가합니다. 유림님의 탁월한 문제 해결 능력이 팀 성과에 큰 기여를 했습니다. 감사합니다.";
-                else if (tone === 'friendly') text = "유림님! 이번 문제 벌써 해결하셨네요? 👍 진짜 우리 팀 슈퍼 크랙답습니다! 덕분에 팀 분위기도 확 살았어요. 정말 고생 많으셨어요! 커피 한잔 해요 ☕️";
-                else text = "하유림님, 어려운 과제임에도 불구하고 주도적으로 해결해 주셔서 든든합니다. 유림님의 퍼포먼스는 항상 기대 이상이네요! 앞으로도 멋진 활약 기대할게요.";
+                const target = currentFeedbackTarget;
+
+                if (target === '하유림') {
+                    if (tone === 'formal') text = "하유림님, 항상 깊이 있는 리서치와 탁월한 결과물을 공유해 주셔서 감사합니다. 유림님의 훌륭한 리서치 퀄리티 덕분에 팀 전체가 새로운 인사이트를 얻고 있습니다. 앞으로도 좋은 활약 기대합니다.";
+                    else if (tone === 'friendly') text = "유림님! 이번에 공유해주신 리서치 자료 진짜 대박이에요 👍 보면서 계속 감탄했어요. 저도 유림님 덕분에 많이 배우고 갑니다! 항상 고마워요 ☕️";
+                    else text = "하유림님, 매번 기대 이상의 리서치 퀄리티를 보여주시는 열정에 박수를 보냅니다! 유림님의 전문성이 우리 팀의 경쟁력을 높이고 있습니다. 최고예요!";
+                } else if (target === '박재현') {
+                    if (tone === 'formal') text = "박재현님, 언제나 회의 분위기를 긍정적으로 이끌어 주셔서 감사합니다. 재현님 덕분에 팀 내 소통이 원활해지고, 업무 효율도 높아지고 있습니다.";
+                    else if (tone === 'friendly') text = "재현님 ㅋㅋ 명실상부 우리 조 분위기 메이커 인정! 😆 회의 때마다 재현님 덕분에 빵 터져서 행복하게 일하고 있어요. 우리 팀의 비타민 같은 존재!";
+                    else text = "박재현님, 지칠 수 있는 상황에서도 웃음을 잃지 않고 팀에 활력을 불어넣어 주셔서 정말 든든합니다. 재현님의 밝은 에너지가 우리 팀의 가장 큰 무기입니다!";
+                } else if (target === '박태희') {
+                    if (tone === 'formal') text = "박태희 팀장님, 탁월한 리더십으로 팀을 성공적으로 이끌어 주셔서 깊이 감사드립니다. 팀장님의 방향성 덕분에 모두가 업무에 확신을 갖고 임할 수 있습니다.";
+                    else if (tone === 'friendly') text = "태희님! 항상 멋지게 리딩해주셔서 너무 감사해요. 태희님 덕분에 요즘 팀 분위기도 좋고 일하는 게 너무 재밌어요! 믿고 따르겠습니다 👍";
+                    else text = "박태희님, 팀원들을 아우르는 리더십과 헌신적인 모습에 항상 감동하고 있습니다. 태희님과 함께라면 어떤 목표든 달성할 수 있을 것 같아요! 화이팅!";
+                } else if (target === '박정호') {
+                    if (tone === 'formal') text = "박정호님, 업무에서 보여주시는 분석력과 통찰력에 매번 놀라고 있습니다. 정호님의 날카로운 인사이트가 프로젝트의 완성도를 높이는 데 큰 역할을 합니다.";
+                    else if (tone === 'friendly') text = "정호님, 이번 분석 진짜 소름... 😲 어떻게 그런 부분까지 캐치하셨어요? 정호님의 엄청난 인사이트, 제가 많이 배우고 있습니다! 리스펙!";
+                    else text = "박정호님, 복잡한 문제의 핵심을 꿰뚫어 보는 통찰력은 우리 팀의 대체 불가한 자산입니다. 정호님의 능력을 마음껏 펼쳐주세요. 항상 응원합니다!";
+                } else {
+                    text = `${target}님, 항상 팀을 위해 노력해주셔서 감사합니다.`;
+                }
                 
-                area.innerHTML = `<textarea class="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed outline-none">${text}</textarea>`;
+                // Fix: Add id="message-input" to the newly generated textarea
+                area.innerHTML = `<textarea class="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed outline-none" id="message-input">${text}</textarea>`;
             }, 800);
         }
 
         function setFeedbackTarget(name) {
+            currentFeedbackTarget = name;
             document.getElementById('generator-title').innerText = `AI 메시지 생성기 (${name}님)`;
+            
+            const cards = ['alert-hayurim', 'alert-parkjaehyun', 'alert-parktaehee', 'alert-parkjeongho'];
+            cards.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    // Reset classes
+                    el.classList.remove('ring-2', 'ring-pink-200', 'bg-pink-50', 'ring-slate-300', 'bg-slate-50', 'bg-blue-50', 'ring-blue-200', 'bg-indigo-50', 'ring-indigo-200');
+                    el.classList.add('bg-white', 'border-slate-200');
+
+                    if (id.includes('hayurim') && name === '하유림') {
+                        el.classList.add('ring-2', 'ring-pink-200', 'bg-pink-50');
+                        el.classList.remove('bg-white', 'border-slate-200');
+                    } else if (id.includes('parkjaehyun') && name === '박재현') {
+                        el.classList.add('ring-2', 'ring-slate-300', 'bg-slate-50');
+                        el.classList.remove('bg-white', 'border-slate-200');
+                    } else if (id.includes('parktaehee') && name === '박태희') {
+                        el.classList.add('ring-2', 'ring-blue-200', 'bg-blue-50');
+                        el.classList.remove('bg-white', 'border-slate-200');
+                    } else if (id.includes('parkjeongho') && name === '박정호') {
+                        el.classList.add('ring-2', 'ring-indigo-200', 'bg-indigo-50');
+                        el.classList.remove('bg-white', 'border-slate-200');
+                    }
+                }
+            });
+            
+            // Fix: Add id="message-input" to the reset textarea
+            document.getElementById('message-area').innerHTML = `<textarea class="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed outline-none" id="message-input">위 버튼을 눌러 AI에게 ${name}님을 위한 초안 작성을 요청하세요.</textarea>`;
         }
 
-        // Dashboard Care Tip Logic
         function renderCareTip(index) {
             const tip = careTips[index];
             const container = document.getElementById('care-content-area');
             
-            // Icon mapping
             let iconHtml = '';
             if(tip.icon === 'coffee') iconHtml = '<i data-lucide="coffee" width="24"></i>';
             if(tip.icon === 'sun') iconHtml = '<i data-lucide="sun" width="24"></i>';
@@ -635,25 +729,17 @@
             }, 500);
         }
 
-        // Initialization
         document.addEventListener('DOMContentLoaded', () => {
-            // Set Date
             document.getElementById('current-date').innerText = new Date().toLocaleDateString();
-
-            // Insert Mascots
             document.getElementById('mascot-small').innerHTML = getPuppySVG('happy', 35);
             document.getElementById('mascot-dashboard').innerHTML = getPuppySVG('smart', 48);
             document.getElementById('mascot-care').innerHTML = getPuppySVG('sleepy', 28);
-
-            // Init Data
+            
             renderCareTip(0);
             renderFairness();
-
-            // Icons
             lucide.createIcons();
         });
 
-        // Mobile Sidebar Toggle
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('hidden');
