@@ -1,721 +1,666 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  LayoutDashboard, 
-  Scale, 
-  MessageCircleHeart, 
-  Clock, 
-  ChevronRight, 
-  Bell, 
-  User, 
-  FileText, 
-  Brain, 
-  Send, 
-  CheckCircle2, 
-  AlertTriangle,
-  BarChart3,
-  Calendar,
-  Search,
-  Menu,
-  X,
-  HelpCircle,
-  Coffee,
-  Sun,
-  Music,
-  Smile,
-  RefreshCw
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Leadership Balancer - B조세계최고</title>
+    
+    <!-- Tailwind CSS (스타일링) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons (아이콘) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 
-// --- Colors (User Custom) ---
-// Main: RGB(165, 0, 52) -> #A50034
-// Sub: RGB(107, 107, 107) -> #6B6B6B
+    <!-- Custom Colors Configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        main: '#A50034', // R165 G0 B52
+                        sub: '#6B6B6B',  // R107 G107 B107
+                    }
+                }
+            }
+        }
+    </script>
 
-// --- Mock Data ---
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        body {
+            font-family: 'Pretendard', sans-serif;
+        }
 
-const teamMembers = [
-  { id: 1, name: '박재현', role: '우리조 분위기 메이커', effort: 92, result: 85, difficulty: '상', recent: '팀 활력 증진 이벤트 기획' },
-  { id: 2, name: '박태희', role: '멋진 팀장님', effort: 98, result: 99, difficulty: '최상', recent: '전사 비전 수립 및 전파' },
-  { id: 3, name: '박정호', role: '우리조 샤크', effort: 88, result: 80, difficulty: '상', recent: '공격적 시장 진입 전략 수립' },
-  { id: 4, name: '하유림', role: '슈퍼 크랙', effort: 95, result: 96, difficulty: '상', recent: '핵심 난제 해결 및 성과 견인' },
-];
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #ccc; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #A50034; 
+        }
 
-const notifications = [
-  { id: 1, type: 'praise', member: '하유림', message: '예정보다 2일 빠르게 핵심 난제를 해결했습니다. 칭찬할 골든타임입니다!', time: '10분 전' },
-  { id: 2, type: 'change', member: '전체', message: '경영진 목표 변경(Q3 KPI 수정)에 따른 영향도 분석이 완료되었습니다.', time: '1시간 전' },
-];
+        .sidebar-item.active {
+            background-color: white;
+            color: #A50034;
+            font-weight: 700;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-item:not(.active):hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
 
-const reports = [
-  { id: 1, title: 'Q3 시장 동향 분석 보고서', length: '24 pages', summary: '경쟁사 A의 점유율이 5% 상승함에 따라 모바일 타겟 마케팅 강화 필요. R&D 예산 10% 증액 제안.' },
-  { id: 2, title: '서버 장애 대응 메뉴얼', length: '15 pages', summary: '장애 발생 시 L1 대응팀 15분 내 소집, L2 에스컬레이션 기준 구체화 필요.' },
-];
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
 
-const careTips = [
-  { id: 1, icon: Coffee, color: 'text-amber-600', bg: 'bg-amber-50', title: '따뜻한 차 한 잔의 여유', content: '계속되는 회의로 목이 타시죠? ☕️ 지금 잠깐 5분만 시간을 내어 따뜻한 캐모마일 티를 마셔보세요. 긴장 완화에 도움이 됩니다.' },
-  { id: 2, icon: Sun, color: 'text-orange-500', bg: 'bg-orange-50', title: '광합성 타임', content: '실내에만 계신가요? ☀️ 창문을 열거나 잠시 옥상에 올라가 햇볕을 쬐어보세요. 비타민D는 리더의 우울감을 없애주는 특효약입니다!' },
-  { id: 3, icon: Music, color: 'text-purple-500', bg: 'bg-purple-50', title: '화이트 노이즈 & 명상', content: '머리가 복잡할 땐 눈을 감고 3분만 심호흡 해보세요. 🎧 빗소리나 파도 소리를 들으며 뇌를 잠시 "오프(Off)" 시키는 것도 전략입니다.' },
-  { id: 4, icon: Smile, color: 'text-pink-500', bg: 'bg-pink-50', title: '거울 보고 스마일', content: '리더의 표정은 팀의 날씨입니다. 😊 거울을 보고 억지로라도 한번 웃어보세요. 뇌가 즐거운 일이 있다고 착각해 엔돌핀을 선물할 거예요.' },
-];
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 h-screen flex overflow-hidden">
 
-// --- Components ---
-
-// Puppy Mascot Component (SVG) - With updated main color for some elements
-const PuppyMascot = ({ emotion = 'happy', size = 40 }) => {
-  const colors = {
-    fur: '#E8C59C',
-    ears: '#8B5A2B',
-    tongue: '#FF6B6B'
-  };
-
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Ears */}
-      <path d="M20 35C20 35 10 50 15 60C20 70 30 45 30 45" fill={colors.ears} stroke="#5C3D1E" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M80 35C80 35 90 50 85 60C80 70 70 45 70 45" fill={colors.ears} stroke="#5C3D1E" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
-      
-      {/* Face */}
-      <circle cx="50" cy="55" r="35" fill={colors.fur} stroke="#5C3D1E" strokeWidth="3"/>
-      
-      {/* Eyes */}
-      <circle cx="38" cy="50" r="4" fill="#333"/>
-      <circle cx="62" cy="50" r="4" fill="#333"/>
-      
-      {/* Nose */}
-      <ellipse cx="50" cy="60" rx="6" ry="4" fill="#333"/>
-      
-      {/* Mouth */}
-      <path d="M45 65Q50 70 55 65" stroke="#333" strokeWidth="2" strokeLinecap="round"/>
-      
-      {/* Tongue */}
-      {emotion === 'happy' && (
-        <path d="M46 68Q50 78 54 68" fill={colors.tongue} stroke="#333" strokeWidth="1"/>
-      )}
-      
-      {/* Glasses */}
-      {emotion === 'smart' && (
-        <g opacity="0.8">
-          <circle cx="38" cy="50" r="8" stroke="#333" strokeWidth="2" fill="none"/>
-          <circle cx="62" cy="50" r="8" stroke="#333" strokeWidth="2" fill="none"/>
-          <line x1="46" y1="50" x2="54" y2="50" stroke="#333" strokeWidth="2"/>
-        </g>
-      )}
-      
-      {/* Sleepy/Relaxed */}
-      {emotion === 'sleepy' && (
-        <g>
-           <path d="M34 48 Q38 52 42 48" stroke="#333" strokeWidth="2" fill="none" />
-           <path d="M58 48 Q62 52 66 48" stroke="#333" strokeWidth="2" fill="none" />
-           <text x="75" y="30" fontSize="20" fill="#5C3D1E">zZ</text>
-        </g>
-      )}
-    </svg>
-  );
-};
-
-const Sidebar = ({ activeTab, setActiveTab, isOpen, setIsOpen }) => {
-  const menuItems = [
-    { id: 'dashboard', label: '대시보드', icon: LayoutDashboard },
-    { id: 'fairness', label: '공정성 확보 (Fact Sheet)', icon: Scale },
-    { id: 'relationship', label: '관계 개선 (Golden Time)', icon: MessageCircleHeart },
-    { id: 'time', label: '시간 확보 (Workload)', icon: Clock },
-  ];
-
-  return (
-    <>
-      {/* Mobile Overlay */}
-      {isOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 md:hidden"
-          onClick={() => setIsOpen(false)}
-        />
-      )}
-      
-      {/* Sidebar */}
-      {/* Main Color Applied to Sidebar BG */}
-      <div className={`fixed md:relative z-30 w-64 h-full bg-[#A50034] text-white transition-transform duration-300 transform ${isOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 flex flex-col`}>
-        <div className="p-6 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Brain className="text-white" size={28} />
-            <span className="text-xl font-bold">Leadership<br/>Balancer</span>
-          </div>
-          <button className="md:hidden text-white/70" onClick={() => setIsOpen(false)}>
-            <X size={24} />
-          </button>
+    <!-- Sidebar -->
+    <div class="w-64 bg-main text-white flex-shrink-0 flex flex-col transition-all duration-300 hidden md:flex" id="sidebar">
+        <div class="p-6 flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <i data-lucide="brain" class="text-white" width="28" height="28"></i>
+                <span class="text-xl font-bold leading-tight">Leadership<br/>Balancer</span>
+            </div>
         </div>
         
-        <nav className="flex-1 px-4 space-y-2">
-          {menuItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => {
-                setActiveTab(item.id);
-                setIsOpen(false);
-              }}
-              className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors ${
-                activeTab === item.id 
-                  ? 'bg-white text-[#A50034] shadow-lg font-bold' 
-                  : 'text-white/80 hover:bg-white/10 hover:text-white'
-              }`}
-            >
-              <item.icon size={20} />
-              <span>{item.label}</span>
+        <nav class="flex-1 px-4 space-y-2">
+            <button onclick="switchTab('dashboard')" class="sidebar-item active w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left">
+                <i data-lucide="layout-dashboard" width="20"></i>
+                <span>대시보드</span>
             </button>
-          ))}
+            <button onclick="switchTab('fairness')" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left text-white/80">
+                <i data-lucide="scale" width="20"></i>
+                <span>공정성 확보</span>
+            </button>
+            <button onclick="switchTab('relationship')" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left text-white/80">
+                <i data-lucide="message-circle-heart" width="20"></i>
+                <span>관계 개선</span>
+            </button>
+            <button onclick="switchTab('time')" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left text-white/80">
+                <i data-lucide="clock" width="20"></i>
+                <span>시간 확보</span>
+            </button>
         </nav>
 
-        <div className="p-6 border-t border-white/20">
-          <div className="bg-black/20 p-4 rounded-lg relative overflow-hidden">
-            <div className="flex justify-between items-center mb-2">
-               <p className="text-xs text-white/80">나의 리더십 에너지</p>
-               <div className="group relative">
-                 <HelpCircle size={12} className="text-white/60 cursor-pointer"/>
-                 <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-black text-xs text-slate-300 rounded hidden group-hover:block z-50">
-                   공정성, 소통, 시간 관리 점수를 종합하여 산출합니다.
-                 </div>
-               </div>
-            </div>
-            
-            <div className="flex items-center space-x-3">
-               <PuppyMascot emotion="happy" size={35} />
-               <div className="flex-1">
-                  <div className="flex items-end space-x-2 mb-1">
-                    <span className="text-2xl font-bold text-green-400">85%</span>
-                    <span className="text-xs text-green-400 mb-1">▲ 안정적</span>
-                  </div>
-                  <div className="w-full bg-black/30 rounded-full h-2">
-                    <div className="bg-green-400 h-2 rounded-full" style={{ width: '85%' }}></div>
-                  </div>
-               </div>
-            </div>
-            <p className="text-[10px] text-white/70 mt-2 text-center">"리더님! 오늘도 아주 훌륭해요! 🐶"</p>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
-
-const Dashboard = ({ setActiveTab }) => {
-  const [currentTip, setCurrentTip] = useState(careTips[0]);
-  const [isRotating, setIsRotating] = useState(false);
-
-  const rotateTip = () => {
-    setIsRotating(true);
-    setTimeout(() => {
-      const randomIndex = Math.floor(Math.random() * careTips.length);
-      setCurrentTip(careTips[randomIndex]);
-      setIsRotating(false);
-    }, 500);
-  };
-
-  return (
-    <div className="space-y-6">
-      <header className="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-        <div className="flex items-center space-x-4">
-          <div className="bg-yellow-100 p-2 rounded-full">
-            <PuppyMascot emotion="smart" size={48} />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-slate-800">B조세계최고 리더님, 반가워요! 🐾</h2>
-            {/* Sub Color Applied */}
-            <p className="text-sm text-[#6B6B6B] mt-1">AI 팩트 시트와 골든타임 알림으로 오늘도 팀을 완벽하게 케어해볼까요?</p>
-          </div>
-        </div>
-        {/* Sub Color Applied */}
-        <span className="text-sm text-[#6B6B6B] bg-slate-50 px-3 py-1 rounded-full">{new Date().toLocaleDateString()}</span>
-      </header>
-
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            {/* Main Color Applied */}
-            <div className="p-3 bg-[#A50034]/10 text-[#A50034] rounded-lg">
-              <Scale size={24} />
-            </div>
-            {/* Sub Color Applied */}
-            <span className="text-xs font-medium text-[#6B6B6B] bg-slate-100 px-2 py-1 rounded">업데이트 필요</span>
-          </div>
-          <h3 className="text-lg font-semibold text-slate-700 mb-1">성과 객관화</h3>
-          <p className="text-sm text-[#6B6B6B]">3명의 팀원에 대한<br/>난이도 보정 데이터가 있습니다.</p>
-          <button onClick={() => setActiveTab('fairness')} className="mt-4 text-sm text-[#A50034] font-medium flex items-center hover:underline">
-            확인하기 <ChevronRight size={16} />
-          </button>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-pink-50 text-pink-600 rounded-lg">
-              <MessageCircleHeart size={24} />
-            </div>
-            <span className="text-xs font-medium text-pink-600 bg-pink-50 px-2 py-1 rounded animate-pulse">2건 대기중</span>
-          </div>
-          <h3 className="text-lg font-semibold text-slate-700 mb-1">피드백 골든타임</h3>
-          <p className="text-sm text-[#6B6B6B]">칭찬 타이밍을 놓치지 마세요.<br/>지금 메시지를 보내보세요.</p>
-          <button onClick={() => setActiveTab('relationship')} className="mt-4 text-sm text-pink-600 font-medium flex items-center hover:underline">
-            메시지 작성 <ChevronRight size={16} />
-          </button>
-        </div>
-
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
-              <Clock size={24} />
-            </div>
-          </div>
-          <h3 className="text-lg font-semibold text-slate-700 mb-1">스마트 워크로드</h3>
-          <p className="text-sm text-[#6B6B6B]">읽지 않은 보고서 2건 요약 완료.<br/>회의 일정 충돌 1건 감지.</p>
-          <button onClick={() => setActiveTab('time')} className="mt-4 text-sm text-indigo-600 font-medium flex items-center hover:underline">
-            일정 조율하기 <ChevronRight size={16} />
-          </button>
-        </div>
-      </div>
-
-      {/* Leader Care Section */}
-      <div className={`bg-white rounded-xl shadow-sm border border-slate-100 p-6 transition-opacity duration-500 ${isRotating ? 'opacity-50' : 'opacity-100'}`}>
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-bold text-slate-800 flex items-center">
-            <PuppyMascot emotion="sleepy" size={28} />
-            <span className="ml-2">🌿 리더를 위한 힐링 한 조각</span>
-          </h3>
-          <button 
-            onClick={rotateTip} 
-            className="text-xs flex items-center text-[#6B6B6B] hover:text-slate-800 transition-colors"
-            disabled={isRotating}
-          >
-            <RefreshCw size={14} className={`mr-1 ${isRotating ? 'animate-spin' : ''}`} />
-            다른 꿀팁 보기
-          </button>
-        </div>
-        <div className={`flex items-start p-4 rounded-xl ${currentTip.bg}`}>
-          <div className={`p-3 rounded-full bg-white shadow-sm ${currentTip.color} mr-4`}>
-            <currentTip.icon size={24} />
-          </div>
-          <div>
-            <h4 className={`font-bold text-lg mb-1 ${currentTip.color}`}>{currentTip.title}</h4>
-            <p className="text-slate-700 leading-relaxed">{currentTip.content}</p>
-            <p className="text-xs text-[#6B6B6B] mt-2">From. 리더의 건강까지 생각하는 케밀리 🐶</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Recent Alerts */}
-      <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-        <h3 className="text-lg font-bold text-slate-800 mb-4">최근 AI 알림</h3>
-        <div className="space-y-4">
-          {notifications.map((noti) => (
-            <div key={noti.id} className="flex items-start space-x-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-              <div className={`mt-1 p-2 rounded-full ${noti.type === 'praise' ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
-                {noti.type === 'praise' ? <CheckCircle2 size={18} /> : <AlertTriangle size={18} />}
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center mb-1">
-                  <h4 className="font-semibold text-slate-800">{noti.type === 'praise' ? '칭찬 추천' : '이슈 감지'}</h4>
-                  <span className="text-xs text-[#6B6B6B]">{noti.time}</span>
+        <div class="p-6 border-t border-white/20">
+            <div class="bg-black/20 p-4 rounded-lg relative">
+                <div class="flex justify-between items-center mb-2">
+                   <p class="text-xs text-white/80">나의 리더십 에너지</p>
+                   <i data-lucide="help-circle" width="12" class="text-white/60 cursor-pointer"></i>
                 </div>
-                <p className="text-sm text-slate-600 mb-2">{noti.message}</p>
-                <button 
-                  onClick={() => setActiveTab('relationship')}
-                  className="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm hover:bg-slate-50 text-[#6B6B6B] font-medium"
-                >
-                  AI 초안 보기
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const FairnessModule = () => {
-  const [selectedMember, setSelectedMember] = useState(teamMembers[0]);
-
-  return (
-    <div className="h-full flex flex-col space-y-6">
-      <header>
-        <h2 className="text-2xl font-bold text-slate-800 mb-1">AI 성과 객관화 팩트 시트</h2>
-        <p className="text-[#6B6B6B]">정성적 데이터를 분석하여 난이도를 보정하고 객관적인 성과 지표를 제공합니다.</p>
-      </header>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-        {/* Team List */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-          <h3 className="font-semibold text-slate-700 mb-4 px-2">팀원 목록</h3>
-          <div className="space-y-2">
-            {teamMembers.map((member) => (
-              <button
-                key={member.id}
-                onClick={() => setSelectedMember(member)}
-                className={`w-full flex items-center justify-between p-3 rounded-lg transition-all ${
-                  selectedMember.id === member.id 
-                    ? 'bg-[#A50034]/5 border-[#A50034]/20 ring-1 ring-[#A50034]/20' 
-                    : 'hover:bg-slate-50 border border-transparent'
-                }`}
-              >
-                <div className="flex items-center space-x-3">
-                  <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">
-                    {member.name[0]}
-                  </div>
-                  <div className="text-left">
-                    <div className="font-medium text-slate-800">{member.name}</div>
-                    <div className="text-xs text-[#6B6B6B]">{member.role}</div>
-                  </div>
+                
+                <div class="flex items-center space-x-3">
+                   <!-- Mascot SVG Small -->
+                   <div id="mascot-small"></div>
+                   
+                   <div class="flex-1">
+                      <div class="flex items-end space-x-2 mb-1">
+                        <span class="text-2xl font-bold text-green-400">85%</span>
+                        <span class="text-xs text-green-400 mb-1">▲ 안정적</span>
+                      </div>
+                      <div class="w-full bg-black/30 rounded-full h-2">
+                        <div class="bg-green-400 h-2 rounded-full" style="width: 85%"></div>
+                      </div>
+                   </div>
                 </div>
-                <ChevronRight size={16} className="text-[#6B6B6B]" />
-              </button>
-            ))}
-          </div>
+                <p class="text-[10px] text-white/70 mt-2 text-center">"리더님! 오늘도 아주 훌륭해요! 🐶"</p>
+            </div>
         </div>
-
-        {/* Fact Sheet Detail */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col">
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <h3 className="text-xl font-bold text-slate-800">{selectedMember.name} <span className="text-base font-normal text-[#6B6B6B]">님의 성과 분석</span></h3>
-              <span className="inline-block mt-1 px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">
-                최근 업무: {selectedMember.recent}
-              </span>
-            </div>
-            <div className="text-right">
-               <div className="text-sm text-[#6B6B6B]">AI 난이도 보정</div>
-               <div className="text-lg font-bold text-[#A50034]">{selectedMember.difficulty} (High)</div>
-            </div>
-          </div>
-
-          {/* Graphs Simulation */}
-          <div className="grid grid-cols-2 gap-6 mb-8">
-            <div className="bg-slate-50 p-4 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-slate-600">기여도 (Effort/Process)</span>
-                <span className="text-lg font-bold text-slate-800">{selectedMember.effort}점</span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-2.5">
-                <div className="bg-[#A50034] h-2.5 rounded-full" style={{ width: `${selectedMember.effort}%` }}></div>
-              </div>
-              <p className="text-xs text-[#6B6B6B] mt-2">야근 시간, 커밋 수, 협업 횟수 기반</p>
-            </div>
-            <div className="bg-slate-50 p-4 rounded-lg">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-sm font-medium text-slate-600">결과 (Result/Outcome)</span>
-                <span className="text-lg font-bold text-slate-800">{selectedMember.result}점</span>
-              </div>
-              <div className="w-full bg-slate-200 rounded-full h-2.5">
-                <div className="bg-green-500 h-2.5 rounded-full" style={{ width: `${selectedMember.result}%` }}></div>
-              </div>
-              <p className="text-xs text-[#6B6B6B] mt-2">KPI 달성률, 코드 품질, 일정 준수 기반</p>
-            </div>
-          </div>
-
-          {/* AI Insight */}
-          <div className="bg-[#A50034]/5 rounded-lg p-5 border border-[#A50034]/20">
-            <div className="flex items-start space-x-3">
-              <div className="mt-1">
-                 <PuppyMascot emotion="smart" size={32} />
-              </div>
-              <div>
-                <h4 className="font-bold text-[#A50034] mb-1">케밀리의 코칭 노트 🐶</h4>
-                <p className="text-sm text-[#A50034] leading-relaxed">
-                  {selectedMember.effort > selectedMember.result 
-                    ? `${selectedMember.name}님은 높은 노력(Process)을 기울였으나, 외부 요인으로 인해 결과(Result) 지표가 다소 낮습니다. 평가 면담 시 이 부분을 충분히 참작했다는 점을 언급하여 억울함을 해소해 주세요. 멍!`
-                    : `${selectedMember.name}님은 효율적으로 성과를 냈습니다. 다만 팀 내 기여도 측면에서 동료들과의 협업 빈도를 높이도록 코칭하면 더 좋은 리더로 성장할 수 있습니다. 멍!`
-                  }
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Timeline */}
-          <div className="mt-8">
-            <h4 className="font-semibold text-slate-700 mb-4">주요 활동 타임라인 (AI 요약)</h4>
-            <div className="border-l-2 border-slate-200 ml-2 space-y-6">
-              <div className="relative pl-6">
-                <div className="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-green-400 border-2 border-white"></div>
-                <span className="text-xs text-[#6B6B6B] block mb-1">2023.10.15</span>
-                <p className="text-sm text-slate-700 font-medium">핵심 모듈 리팩토링 완료 (성능 20% 향상)</p>
-              </div>
-              <div className="relative pl-6">
-                <div className="absolute -left-1.5 top-1.5 w-3 h-3 rounded-full bg-slate-300 border-2 border-white"></div>
-                <span className="text-xs text-[#6B6B6B] block mb-1">2023.09.20</span>
-                <p className="text-sm text-slate-700">타 부서 협업 요청 대응 (3건)</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
-  );
-};
 
-const RelationshipModule = () => {
-  const [generatedText, setGeneratedText] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [selectedTone, setSelectedTone] = useState('friendly');
-
-  const generateMessage = (tone) => {
-    setIsGenerating(true);
-    setSelectedTone(tone);
-    setGeneratedText('');
-    
-    // Simulate AI API Call
-    setTimeout(() => {
-      let text = "";
-      if (tone === 'formal') {
-        text = "하유림님, 금번 핵심 난제를 예정보다 빠르게 해결해주신 점 높이 평가합니다. 유림님의 탁월한 문제 해결 능력이 팀 성과에 큰 기여를 했습니다. 감사합니다.";
-      } else if (tone === 'friendly') {
-        text = "유림님! 이번 문제 벌써 해결하셨네요? 👍 진짜 우리 팀 슈퍼 크랙답습니다! 덕분에 팀 분위기도 확 살았어요. 정말 고생 많으셨어요! 커피 한잔 해요 ☕️";
-      } else {
-        text = "하유림님, 어려운 과제임에도 불구하고 주도적으로 해결해 주셔서 든든합니다. 유림님의 퍼포먼스는 항상 기대 이상이네요! 앞으로도 멋진 활약 기대할게요.";
-      }
-      setGeneratedText(text);
-      setIsGenerating(false);
-    }, 800);
-  };
-
-  return (
-    <div className="h-full flex flex-col space-y-6">
-      <header>
-        <h2 className="text-2xl font-bold text-slate-800 mb-1">피드백 골든타임 코치</h2>
-        <p className="text-[#6B6B6B]">놓치기 쉬운 칭찬 타이밍을 잡고, 상황에 맞는 완벽한 메시지를 AI가 제안합니다.</p>
-      </header>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Alert List */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-          <h3 className="font-semibold text-slate-700 mb-4 flex items-center">
-            <Bell size={18} className="mr-2 text-pink-500" />
-            피드백 추천 알림
-          </h3>
-          <div className="space-y-4">
-            <div className="p-4 border border-pink-100 bg-pink-50 rounded-lg cursor-pointer ring-2 ring-pink-200">
-              <div className="flex justify-between items-start mb-2">
-                <span className="font-bold text-slate-800">하유림 (슈퍼 크랙)</span>
-                <span className="text-xs text-pink-600 bg-white px-2 py-1 rounded-full font-medium">즉시 칭찬 필요</span>
-              </div>
-              <p className="text-sm text-slate-700 mb-3">
-                마감일보다 2일 일찍 업무를 완료했습니다. 지금 칭찬하면 동기부여 효과가 200% 상승합니다.
-              </p>
-              <div className="text-xs text-[#6B6B6B]">발생 시각: 10분 전</div>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden relative">
+        
+        <!-- Mobile Header -->
+        <header class="md:hidden bg-white border-b border-slate-200 p-4 flex justify-between items-center z-10">
+            <div class="flex items-center space-x-2">
+                <i data-lucide="brain" class="text-main"></i>
+                <span class="font-bold text-lg text-main">Leadership Balancer</span>
             </div>
-            
-            <div className="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer">
-              <div className="flex justify-between items-start mb-2">
-                <span className="font-bold text-slate-800">박재현 (분위기 메이커)</span>
-                <span className="text-xs text-[#6B6B6B] bg-slate-100 px-2 py-1 rounded-full">격려 필요</span>
-              </div>
-              <p className="text-sm text-slate-700 mb-3">
-                팀 이벤트 기획으로 야근 기록이 있습니다. 번아웃 방지를 위해 격려 메시지를 보내보세요.
-              </p>
-              <div className="text-xs text-[#6B6B6B]">발생 시각: 9시간 전</div>
-            </div>
-          </div>
-        </div>
-
-        {/* AI Writer */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col">
-          <h3 className="font-semibold text-slate-700 mb-4 flex items-center">
-            <Brain size={18} className="mr-2 text-[#A50034]" />
-            AI 메시지 생성기 (하유림님)
-          </h3>
-          
-          <div className="flex space-x-2 mb-4">
-            <button 
-              onClick={() => generateMessage('formal')}
-              className={`flex-1 py-2 text-sm rounded-lg border transition-colors ${selectedTone === 'formal' ? 'bg-slate-800 text-white border-slate-800' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
-            >
-              정중한/공식적
+            <button onclick="toggleSidebar()" class="text-sub">
+                <i data-lucide="menu"></i>
             </button>
-            <button 
-              onClick={() => generateMessage('friendly')}
-              className={`flex-1 py-2 text-sm rounded-lg border transition-colors ${selectedTone === 'friendly' ? 'bg-[#A50034] text-white border-[#A50034]' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
-            >
-              친근한/부드러운
-            </button>
-            <button 
-              onClick={() => generateMessage('cheer')}
-              className={`flex-1 py-2 text-sm rounded-lg border transition-colors ${selectedTone === 'cheer' ? 'bg-green-500 text-white border-green-500' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'}`}
-            >
-              격려/에너지
-            </button>
-          </div>
-
-          <div className="flex-1 bg-slate-50 rounded-lg border border-slate-200 p-4 mb-4 relative min-h-[150px]">
-            {isGenerating ? (
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="flex flex-col items-center space-y-2">
-                  <div className="w-6 h-6 border-2 border-[#A50034] border-t-transparent rounded-full animate-spin"></div>
-                  <span className="text-xs text-[#A50034]">케밀리가 고민중입니다... 🐶</span>
-                </div>
-              </div>
-            ) : (
-              <textarea 
-                className="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed"
-                value={generatedText || "위 버튼을 눌러 AI에게 초안 작성을 요청하세요."}
-                onChange={(e) => setGeneratedText(e.target.value)}
-              />
-            )}
-          </div>
-
-          <button className="w-full bg-[#A50034] hover:bg-[#A50034]/90 text-white py-3 rounded-lg font-medium flex items-center justify-center transition-colors">
-            <Send size={18} className="mr-2" />
-            메신저로 전송하기
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-const TimeModule = () => {
-  return (
-    <div className="h-full flex flex-col space-y-6">
-      <header>
-        <h2 className="text-2xl font-bold text-slate-800 mb-1">스마트 워크로드 매니저</h2>
-        <p className="text-[#6B6B6B]">행정 업무 자동화와 정보 검색 지원으로 리더의 전략적 시간을 확보합니다.</p>
-      </header>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Document Summarizer */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-            <h3 className="font-semibold text-slate-700 mb-4 flex items-center justify-between">
-              <div className="flex items-center">
-                <FileText size={18} className="mr-2 text-indigo-500" />
-                문서/메일 AI 요약
-              </div>
-              <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">2건 처리 완료</span>
-            </h3>
-            <div className="space-y-4">
-              {reports.map((report) => (
-                <div key={report.id} className="border border-slate-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="flex items-center space-x-2">
-                      <span className="font-bold text-slate-800">{report.title}</span>
-                      <span className="text-xs text-[#6B6B6B]">({report.length})</span>
-                    </div>
-                    <button className="text-xs text-[#6B6B6B] underline">원본 보기</button>
-                  </div>
-                  <div className="bg-slate-50 p-3 rounded text-sm text-slate-700 leading-relaxed">
-                    <span className="inline-block bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded mr-2 align-middle">AI 요약</span>
-                    {report.summary}
-                  </div>
-                  <div className="mt-3 flex space-x-2">
-                    <button className="text-xs bg-white border border-slate-300 px-3 py-1.5 rounded hover:bg-slate-50 text-slate-600">팀 공유하기</button>
-                    <button className="text-xs bg-white border border-slate-300 px-3 py-1.5 rounded hover:bg-slate-50 text-slate-600">일정에 추가</button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-            <h3 className="font-semibold text-slate-700 mb-4 flex items-center">
-              <Search size={18} className="mr-2 text-[#6B6B6B]" />
-              시장 분석/정보 검색 오토메이션
-            </h3>
-            <div className="flex space-x-2 mb-4">
-               <input type="text" placeholder="궁금한 기술 트렌드나 시장 정보를 입력하세요..." className="flex-1 border border-slate-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-[#A50034]" />
-               <button className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm">검색 및 요약</button>
-            </div>
-            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
-              <p className="text-sm text-slate-600 text-center py-2">
-                "최근 생성형 AI의 HR 적용 사례"에 대한 보고서 초안이 준비되어 있습니다.
-              </p>
-              <button className="w-full mt-2 text-[#A50034] text-sm font-medium hover:underline">초안 확인하기</button>
-            </div>
-          </div>
-        </div>
-
-        {/* Schedule Manager */}
-        <div className="bg-white rounded-xl shadow-sm border border-slate-100 p-6 h-fit">
-          <h3 className="font-semibold text-slate-700 mb-4 flex items-center">
-            <Calendar size={18} className="mr-2 text-orange-500" />
-            스마트 일정 관리
-          </h3>
-          
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-slate-600">오늘의 일정 충돌 감지</span>
-              <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold">1건</span>
-            </div>
-            <div className="p-3 border-l-4 border-red-400 bg-red-50 rounded-r-lg">
-              <p className="text-sm font-bold text-slate-800">14:00 팀 주간회의</p>
-              <p className="text-sm text-[#6B6B6B]">vs 경영진 긴급 보고</p>
-              <div className="mt-3 bg-white p-2 rounded border border-red-100">
-                <p className="text-xs text-slate-500 mb-1">🤖 AI 조율안 추천</p>
-                <p className="text-xs text-slate-800 font-medium">팀 주간회의를 내일 오전 10시로 변경하고, 메일로 사전 공지 발송.</p>
-                <button className="mt-2 w-full bg-red-500 text-white text-xs py-1.5 rounded hover:bg-red-600">이대로 조율하기</button>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-medium text-slate-600 mb-3">내일의 추천 업무 (Prioritized)</h4>
-            <ul className="space-y-2">
-              <li className="flex items-center text-sm text-slate-700">
-                <span className="w-1.5 h-1.5 bg-[#A50034] rounded-full mr-2"></span>
-                Q3 보고서 최종 검토
-              </li>
-              <li className="flex items-center text-sm text-slate-700">
-                <span className="w-1.5 h-1.5 bg-[#A50034] rounded-full mr-2"></span>
-                김민수 선임 면담 (격려)
-              </li>
-              <li className="flex items-center text-sm text-[#6B6B6B] line-through">
-                <span className="w-1.5 h-1.5 bg-slate-300 rounded-full mr-2"></span>
-                주간 식대 정산 (자동처리됨)
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// --- Main App ---
-
-const App = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [isSidebarOpen, setSidebarOpen] = useState(false);
-
-  const renderContent = () => {
-    switch (activeTab) {
-      case 'fairness': return <FairnessModule />;
-      case 'relationship': return <RelationshipModule />;
-      case 'time': return <TimeModule />;
-      default: return <Dashboard setActiveTab={setActiveTab} />;
-    }
-  };
-
-  return (
-    <div className="flex h-screen bg-slate-50 font-sans text-slate-900">
-      <Sidebar 
-        activeTab={activeTab} 
-        setActiveTab={setActiveTab} 
-        isOpen={isSidebarOpen} 
-        setIsOpen={setSidebarOpen} 
-      />
-      
-      <div className="flex-1 flex flex-col h-full overflow-hidden">
-        {/* Mobile Header */}
-        <header className="md:hidden bg-white border-b border-slate-200 p-4 flex justify-between items-center z-10">
-          <div className="flex items-center space-x-2">
-            <Brain className="text-[#A50034]" size={24} />
-            <span className="font-bold text-lg">Leadership Balancer</span>
-          </div>
-          <button onClick={() => setSidebarOpen(true)} className="text-slate-600">
-            <Menu size={24} />
-          </button>
         </header>
 
-        {/* Main Content Area */}
-        <main className="flex-1 overflow-auto p-4 md:p-8">
-          <div className="max-w-6xl mx-auto h-full">
-            {renderContent()}
-          </div>
-        </main>
-      </div>
-    </div>
-  );
-};
+        <!-- Main Scroll Area -->
+        <main class="flex-1 overflow-auto p-4 md:p-8 bg-slate-50">
+            <div class="max-w-6xl mx-auto h-full" id="content-area">
+                
+                <!-- 1. Dashboard View -->
+                <div id="view-dashboard" class="fade-in space-y-6">
+                    <!-- Header -->
+                    <header class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+                        <div class="flex items-center space-x-4">
+                            <div class="bg-yellow-100 p-2 rounded-full" id="mascot-dashboard">
+                                <!-- Mascot injected via JS -->
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold text-slate-800">B조세계최고 리더님, 반가워요! 🐾</h2>
+                                <p class="text-sm text-sub mt-1">AI 팩트 시트와 골든타임 알림으로 오늘도 팀을 완벽하게 케어해볼까요?</p>
+                            </div>
+                        </div>
+                        <span class="text-sm text-sub bg-slate-50 px-3 py-1 rounded-full" id="current-date"></span>
+                    </header>
 
-export default App;
+                    <!-- KPI Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Fairness Card -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 bg-main/10 text-main rounded-lg">
+                                    <i data-lucide="scale" width="24"></i>
+                                </div>
+                                <span class="text-xs font-medium text-sub bg-slate-100 px-2 py-1 rounded">업데이트 필요</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-slate-700 mb-1">성과 객관화</h3>
+                            <p class="text-sm text-sub">3명의 팀원에 대한<br/>난이도 보정 데이터가 있습니다.</p>
+                            <button onclick="switchTab('fairness')" class="mt-4 text-sm text-main font-medium flex items-center hover:underline">
+                                확인하기 <i data-lucide="chevron-right" width="16" class="ml-1"></i>
+                            </button>
+                        </div>
+
+                        <!-- Relationship Card -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 bg-pink-50 text-pink-600 rounded-lg">
+                                    <i data-lucide="message-circle-heart" width="24"></i>
+                                </div>
+                                <span class="text-xs font-medium text-pink-600 bg-pink-50 px-2 py-1 rounded animate-pulse">2건 대기중</span>
+                            </div>
+                            <h3 class="text-lg font-semibold text-slate-700 mb-1">피드백 골든타임</h3>
+                            <p class="text-sm text-sub">칭찬 타이밍을 놓치지 마세요.<br/>지금 메시지를 보내보세요.</p>
+                            <button onclick="switchTab('relationship')" class="mt-4 text-sm text-pink-600 font-medium flex items-center hover:underline">
+                                메시지 작성 <i data-lucide="chevron-right" width="16" class="ml-1"></i>
+                            </button>
+                        </div>
+
+                        <!-- Time Card -->
+                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+                                    <i data-lucide="clock" width="24"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-semibold text-slate-700 mb-1">스마트 워크로드</h3>
+                            <p class="text-sm text-sub">읽지 않은 보고서 2건 요약 완료.<br/>회의 일정 충돌 1건 감지.</p>
+                            <button onclick="switchTab('time')" class="mt-4 text-sm text-indigo-600 font-medium flex items-center hover:underline">
+                                일정 조율하기 <i data-lucide="chevron-right" width="16" class="ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Leader Care Section -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 transition-opacity duration-500" id="care-section">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-bold text-slate-800 flex items-center">
+                                <span id="mascot-care" class="mr-2"></span>
+                                <span>🌿 리더를 위한 힐링 한 조각</span>
+                            </h3>
+                            <button onclick="rotateTip()" class="text-xs flex items-center text-sub hover:text-slate-800 transition-colors">
+                                <i data-lucide="refresh-cw" width="14" class="mr-1" id="refresh-icon"></i>
+                                다른 꿀팁 보기
+                            </button>
+                        </div>
+                        <div id="care-content-area" class="flex items-start p-4 rounded-xl bg-amber-50">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+
+                    <!-- Recent Alerts -->
+                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                        <h3 class="text-lg font-bold text-slate-800 mb-4">최근 AI 알림</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                <div class="mt-1 p-2 rounded-full bg-green-100 text-green-600">
+                                    <i data-lucide="check-circle-2" width="18"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <h4 class="font-semibold text-slate-800">칭찬 추천</h4>
+                                        <span class="text-xs text-sub">10분 전</span>
+                                    </div>
+                                    <p class="text-sm text-slate-600 mb-2"><strong>하유림</strong>님이 예정보다 2일 빠르게 핵심 난제를 해결했습니다. 칭찬할 골든타임입니다!</p>
+                                    <button onclick="switchTab('relationship')" class="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm hover:bg-slate-50 text-sub font-medium">AI 초안 보기</button>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start space-x-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+                                <div class="mt-1 p-2 rounded-full bg-yellow-100 text-yellow-600">
+                                    <i data-lucide="alert-triangle" width="18"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex justify-between items-center mb-1">
+                                        <h4 class="font-semibold text-slate-800">이슈 감지</h4>
+                                        <span class="text-xs text-sub">1시간 전</span>
+                                    </div>
+                                    <p class="text-sm text-slate-600 mb-2">경영진 목표 변경(Q3 KPI 수정)에 따른 영향도 분석이 완료되었습니다.</p>
+                                    <button onclick="switchTab('time')" class="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm hover:bg-slate-50 text-sub font-medium">분석 확인하기</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. Fairness Module View -->
+                <div id="view-fairness" class="hidden fade-in h-full flex flex-col space-y-6">
+                    <header>
+                        <h2 class="text-2xl font-bold text-slate-800 mb-1">AI 성과 객관화 팩트 시트</h2>
+                        <p class="text-sub">정성적 데이터를 분석하여 난이도를 보정하고 객관적인 성과 지표를 제공합니다.</p>
+                    </header>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                        <!-- Team List -->
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
+                            <h3 class="font-semibold text-slate-700 mb-4 px-2">팀원 목록</h3>
+                            <div class="space-y-2" id="team-list-container">
+                                <!-- JS Generated -->
+                            </div>
+                        </div>
+
+                        <!-- Detail View -->
+                        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col" id="fairness-detail">
+                            <!-- JS Generated -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Relationship Module View -->
+                <div id="view-relationship" class="hidden fade-in h-full flex flex-col space-y-6">
+                    <header>
+                        <h2 class="text-2xl font-bold text-slate-800 mb-1">피드백 골든타임 코치</h2>
+                        <p class="text-sub">놓치기 쉬운 칭찬 타이밍을 잡고, 상황에 맞는 완벽한 메시지를 AI가 제안합니다.</p>
+                    </header>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <!-- Alerts -->
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                            <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
+                                <i data-lucide="bell" width="18" class="mr-2 text-pink-500"></i>
+                                피드백 추천 알림
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="p-4 border border-pink-100 bg-pink-50 rounded-lg cursor-pointer ring-2 ring-pink-200" onclick="setFeedbackTarget('하유림')">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="font-bold text-slate-800">하유림 (슈퍼 크랙)</span>
+                                        <span class="text-xs text-pink-600 bg-white px-2 py-1 rounded-full font-medium">즉시 칭찬 필요</span>
+                                    </div>
+                                    <p class="text-sm text-slate-700 mb-3">마감일보다 2일 일찍 업무를 완료했습니다. 지금 칭찬하면 동기부여 효과가 200% 상승합니다.</p>
+                                    <div class="text-xs text-sub">발생 시각: 10분 전</div>
+                                </div>
+                                <div class="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer" onclick="setFeedbackTarget('박재현')">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <span class="font-bold text-slate-800">박재현 (분위기 메이커)</span>
+                                        <span class="text-xs text-sub bg-slate-100 px-2 py-1 rounded-full">격려 필요</span>
+                                    </div>
+                                    <p class="text-sm text-slate-700 mb-3">팀 이벤트 기획으로 야근 기록이 있습니다. 번아웃 방지를 위해 격려 메시지를 보내보세요.</p>
+                                    <div class="text-xs text-sub">발생 시각: 9시간 전</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Generator -->
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col">
+                            <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
+                                <i data-lucide="brain" width="18" class="mr-2 text-main"></i>
+                                <span id="generator-title">AI 메시지 생성기 (하유림님)</span>
+                            </h3>
+                            
+                            <div class="flex space-x-2 mb-4">
+                                <button onclick="generateMessage('formal')" class="flex-1 py-2 text-sm rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">정중한/공식적</button>
+                                <button onclick="generateMessage('friendly')" class="flex-1 py-2 text-sm rounded-lg border border-main bg-main text-white">친근한/부드러운</button>
+                                <button onclick="generateMessage('cheer')" class="flex-1 py-2 text-sm rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">격려/에너지</button>
+                            </div>
+
+                            <div class="flex-1 bg-slate-50 rounded-lg border border-slate-200 p-4 mb-4 relative min-h-[150px]" id="message-area">
+                                <textarea class="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed outline-none" id="message-input">위 버튼을 눌러 AI에게 초안 작성을 요청하세요.</textarea>
+                            </div>
+
+                            <button class="w-full bg-main hover:bg-red-800 text-white py-3 rounded-lg font-medium flex items-center justify-center transition-colors">
+                                <i data-lucide="send" width="18" class="mr-2"></i>
+                                메신저로 전송하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. Time Module View -->
+                <div id="view-time" class="hidden fade-in h-full flex flex-col space-y-6">
+                    <header>
+                        <h2 class="text-2xl font-bold text-slate-800 mb-1">스마트 워크로드 매니저</h2>
+                        <p class="text-sub">행정 업무 자동화와 정보 검색 지원으로 리더의 전략적 시간을 확보합니다.</p>
+                    </header>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2 space-y-6">
+                            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
+                                <h3 class="font-semibold text-slate-700 mb-4 flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <i data-lucide="file-text" width="18" class="mr-2 text-indigo-500"></i>
+                                        문서/메일 AI 요약
+                                    </div>
+                                    <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">2건 처리 완료</span>
+                                </h3>
+                                <div class="space-y-4">
+                                    <div class="border border-slate-200 rounded-lg p-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="font-bold text-slate-800">Q3 시장 동향 분석 보고서</span>
+                                                <span class="text-xs text-sub">(24 pages)</span>
+                                            </div>
+                                            <button class="text-xs text-sub underline">원본 보기</button>
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded text-sm text-slate-700 leading-relaxed">
+                                            <span class="inline-block bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded mr-2 align-middle">AI 요약</span>
+                                            경쟁사 A의 점유율이 5% 상승함에 따라 모바일 타겟 마케팅 강화 필요. R&D 예산 10% 증액 제안.
+                                        </div>
+                                    </div>
+                                    <div class="border border-slate-200 rounded-lg p-4">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <div class="flex items-center space-x-2">
+                                                <span class="font-bold text-slate-800">서버 장애 대응 메뉴얼</span>
+                                                <span class="text-xs text-sub">(15 pages)</span>
+                                            </div>
+                                            <button class="text-xs text-sub underline">원본 보기</button>
+                                        </div>
+                                        <div class="bg-slate-50 p-3 rounded text-sm text-slate-700 leading-relaxed">
+                                            <span class="inline-block bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded mr-2 align-middle">AI 요약</span>
+                                            장애 발생 시 L1 대응팀 15분 내 소집, L2 에스컬레이션 기준 구체화 필요.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 h-fit">
+                            <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
+                                <i data-lucide="calendar" width="18" class="mr-2 text-orange-500"></i>
+                                스마트 일정 관리
+                            </h3>
+                            
+                            <div class="mb-6">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-sm font-medium text-slate-600">오늘의 일정 충돌 감지</span>
+                                    <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold">1건</span>
+                                </div>
+                                <div class="p-3 border-l-4 border-red-400 bg-red-50 rounded-r-lg">
+                                    <p class="text-sm font-bold text-slate-800">14:00 팀 주간회의</p>
+                                    <p class="text-sm text-sub">vs 경영진 긴급 보고</p>
+                                    <div class="mt-3 bg-white p-2 rounded border border-red-100">
+                                        <p class="text-xs text-slate-500 mb-1">🤖 AI 조율안 추천</p>
+                                        <p class="text-xs text-slate-800 font-medium">팀 주간회의를 내일 오전 10시로 변경하고, 메일로 사전 공지 발송.</p>
+                                        <button class="mt-2 w-full bg-red-500 text-white text-xs py-1.5 rounded hover:bg-red-600">이대로 조율하기</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- Data ---
+        const teamMembers = [
+            { id: 1, name: '박재현', role: '우리조 분위기 메이커', effort: 92, result: 85, difficulty: '상', recent: '팀 활력 증진 이벤트 기획' },
+            { id: 2, name: '박태희', role: '멋진 팀장님', effort: 98, result: 99, difficulty: '최상', recent: '전사 비전 수립 및 전파' },
+            { id: 3, name: '박정호', role: '우리조 샤크', effort: 88, result: 80, difficulty: '상', recent: '공격적 시장 진입 전략 수립' },
+            { id: 4, name: '하유림', role: '슈퍼 크랙', effort: 95, result: 96, difficulty: '상', recent: '핵심 난제 해결 및 성과 견인' },
+        ];
+
+        const careTips = [
+            { icon: 'coffee', color: 'text-amber-600', bg: 'bg-amber-50', title: '따뜻한 차 한 잔의 여유', content: '계속되는 회의로 목이 타시죠? ☕️ 지금 잠깐 5분만 시간을 내어 따뜻한 캐모마일 티를 마셔보세요. 긴장 완화에 도움이 됩니다.' },
+            { icon: 'sun', color: 'text-orange-500', bg: 'bg-orange-50', title: '광합성 타임', content: '실내에만 계신가요? ☀️ 창문을 열거나 잠시 옥상에 올라가 햇볕을 쬐어보세요. 비타민D는 리더의 우울감을 없애주는 특효약입니다!' },
+            { icon: 'music', color: 'text-purple-500', bg: 'bg-purple-50', title: '화이트 노이즈 & 명상', content: '머리가 복잡할 땐 눈을 감고 3분만 심호흡 해보세요. 🎧 빗소리나 파도 소리를 들으며 뇌를 잠시 "오프(Off)" 시키는 것도 전략입니다.' },
+            { icon: 'smile', color: 'text-pink-500', bg: 'bg-pink-50', title: '거울 보고 스마일', content: '리더의 표정은 팀의 날씨입니다. 😊 거울을 보고 억지로라도 한번 웃어보세요. 뇌가 즐거운 일이 있다고 착각해 엔돌핀을 선물할 거예요.' },
+        ];
+
+        let selectedMemberId = 1;
+
+        // --- Functions ---
+
+        // Mascot SVG Generator
+        function getPuppySVG(emotion = 'happy', size = 40) {
+            const colors = { fur: '#E8C59C', ears: '#8B5A2B', tongue: '#FF6B6B' };
+            let extras = '';
+            if(emotion === 'smart') {
+                extras = `<g opacity="0.8"><circle cx="38" cy="50" r="8" stroke="#333" stroke-width="2" fill="none"/><circle cx="62" cy="50" r="8" stroke="#333" stroke-width="2" fill="none"/><line x1="46" y1="50" x2="54" y2="50" stroke="#333" stroke-width="2"/></g>`;
+            } else if(emotion === 'sleepy') {
+                extras = `<g><path d="M34 48 Q38 52 42 48" stroke="#333" stroke-width="2" fill="none" /><path d="M58 48 Q62 52 66 48" stroke="#333" stroke-width="2" fill="none" /><text x="75" y="30" font-size="20" fill="#5C3D1E">zZ</text></g>`;
+            } else if(emotion === 'happy') {
+                 extras = `<path d="M46 68Q50 78 54 68" fill="${colors.tongue}" stroke="#333" stroke-width="1"/>`;
+            }
+
+            return `<svg width="${size}" height="${size}" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20 35C20 35 10 50 15 60C20 70 30 45 30 45" fill="${colors.ears}" stroke="#5C3D1E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M80 35C80 35 90 50 85 60C80 70 70 45 70 45" fill="${colors.ears}" stroke="#5C3D1E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="50" cy="55" r="35" fill="${colors.fur}" stroke="#5C3D1E" stroke-width="3"/>
+                <circle cx="38" cy="50" r="4" fill="#333"/>
+                <circle cx="62" cy="50" r="4" fill="#333"/>
+                <ellipse cx="50" cy="60" rx="6" ry="4" fill="#333"/>
+                <path d="M45 65Q50 70 55 65" stroke="#333" stroke-width="2" stroke-linecap="round"/>
+                ${extras}
+            </svg>`;
+        }
+
+        // Tab Switcher
+        function switchTab(tabName) {
+            // Hide all views
+            ['dashboard', 'fairness', 'relationship', 'time'].forEach(t => {
+                document.getElementById(`view-${t}`).classList.add('hidden');
+            });
+            // Show selected
+            document.getElementById(`view-${tabName}`).classList.remove('hidden');
+            
+            // Update Sidebar
+            const buttons = document.querySelectorAll('.sidebar-item');
+            buttons.forEach(btn => {
+                if(btn.textContent.trim().includes(translateTab(tabName))) {
+                    btn.classList.add('active', 'text-main');
+                    btn.classList.remove('text-white/80');
+                } else {
+                    btn.classList.remove('active', 'text-main');
+                    btn.classList.add('text-white/80');
+                }
+            });
+
+            // Trigger icons refresh for dynamic content
+            lucide.createIcons();
+        }
+
+        function translateTab(eng) {
+            const map = { 'dashboard': '대시보드', 'fairness': '공정성', 'relationship': '관계', 'time': '시간' };
+            return map[eng];
+        }
+
+        // Fairness Module Logic
+        function renderFairness() {
+            const listContainer = document.getElementById('team-list-container');
+            listContainer.innerHTML = teamMembers.map(m => `
+                <button onclick="selectMember(${m.id})" class="w-full flex items-center justify-between p-3 rounded-lg transition-all ${m.id === selectedMemberId ? 'bg-main/5 border border-main/20 ring-1 ring-main/20' : 'hover:bg-slate-50 border border-transparent'}">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">
+                            ${m.name[0]}
+                        </div>
+                        <div class="text-left">
+                            <div class="font-medium text-slate-800">${m.name}</div>
+                            <div class="text-xs text-sub">${m.role}</div>
+                        </div>
+                    </div>
+                    <i data-lucide="chevron-right" width="16" class="text-sub"></i>
+                </button>
+            `).join('');
+
+            const member = teamMembers.find(m => m.id === selectedMemberId);
+            const detailContainer = document.getElementById('fairness-detail');
+            
+            // Insight text logic
+            const insight = member.effort > member.result 
+                ? `${member.name}님은 높은 노력(Process)을 기울였으나, 외부 요인으로 인해 결과(Result) 지표가 다소 낮습니다. 평가 면담 시 이 부분을 충분히 참작했다는 점을 언급하여 억울함을 해소해 주세요. 멍!`
+                : `${member.name}님은 효율적으로 성과를 냈습니다. 다만 팀 내 기여도 측면에서 동료들과의 협업 빈도를 높이도록 코칭하면 더 좋은 리더로 성장할 수 있습니다. 멍!`;
+
+            detailContainer.innerHTML = `
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h3 class="text-xl font-bold text-slate-800">${member.name} <span class="text-base font-normal text-sub">님의 성과 분석</span></h3>
+                        <span class="inline-block mt-1 px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">최근 업무: ${member.recent}</span>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm text-sub">AI 난이도 보정</div>
+                        <div class="text-lg font-bold text-main">${member.difficulty} (High)</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-6 mb-8">
+                    <div class="bg-slate-50 p-4 rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-slate-600">기여도 (Effort)</span>
+                            <span class="text-lg font-bold text-slate-800">${member.effort}점</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2.5">
+                            <div class="bg-main h-2.5 rounded-full" style="width: ${member.effort}%"></div>
+                        </div>
+                        <p class="text-xs text-sub mt-2">야근 시간, 커밋 수 등 기반</p>
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-slate-600">결과 (Result)</span>
+                            <span class="text-lg font-bold text-slate-800">${member.result}점</span>
+                        </div>
+                        <div class="w-full bg-slate-200 rounded-full h-2.5">
+                            <div class="bg-green-500 h-2.5 rounded-full" style="width: ${member.result}%"></div>
+                        </div>
+                        <p class="text-xs text-sub mt-2">KPI 달성률, 품질 기반</p>
+                    </div>
+                </div>
+                <div class="bg-main/5 rounded-lg p-5 border border-main/20">
+                    <div class="flex items-start space-x-3">
+                        <div class="mt-1">${getPuppySVG('smart', 32)}</div>
+                        <div>
+                            <h4 class="font-bold text-main mb-1">케밀리의 코칭 노트 🐶</h4>
+                            <p class="text-sm text-main leading-relaxed">${insight}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function selectMember(id) {
+            selectedMemberId = id;
+            renderFairness();
+        }
+
+        // Relationship Logic
+        function generateMessage(tone) {
+            const area = document.getElementById('message-area');
+            const input = document.getElementById('message-input');
+            
+            // Loading state
+            input.value = '';
+            area.innerHTML = `
+                <div class="absolute inset-0 flex items-center justify-center flex-col">
+                    <div class="w-6 h-6 border-2 border-main border-t-transparent rounded-full animate-spin mb-2"></div>
+                    <span class="text-xs text-main">케밀리가 고민중입니다... 🐶</span>
+                </div>
+            `;
+
+            setTimeout(() => {
+                let text = "";
+                if (tone === 'formal') text = "하유림님, 금번 핵심 난제를 예정보다 빠르게 해결해주신 점 높이 평가합니다. 유림님의 탁월한 문제 해결 능력이 팀 성과에 큰 기여를 했습니다. 감사합니다.";
+                else if (tone === 'friendly') text = "유림님! 이번 문제 벌써 해결하셨네요? 👍 진짜 우리 팀 슈퍼 크랙답습니다! 덕분에 팀 분위기도 확 살았어요. 정말 고생 많으셨어요! 커피 한잔 해요 ☕️";
+                else text = "하유림님, 어려운 과제임에도 불구하고 주도적으로 해결해 주셔서 든든합니다. 유림님의 퍼포먼스는 항상 기대 이상이네요! 앞으로도 멋진 활약 기대할게요.";
+                
+                area.innerHTML = `<textarea class="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed outline-none">${text}</textarea>`;
+            }, 800);
+        }
+
+        function setFeedbackTarget(name) {
+            document.getElementById('generator-title').innerText = `AI 메시지 생성기 (${name}님)`;
+        }
+
+        // Dashboard Care Tip Logic
+        function renderCareTip(index) {
+            const tip = careTips[index];
+            const container = document.getElementById('care-content-area');
+            
+            // Icon mapping
+            let iconHtml = '';
+            if(tip.icon === 'coffee') iconHtml = '<i data-lucide="coffee" width="24"></i>';
+            if(tip.icon === 'sun') iconHtml = '<i data-lucide="sun" width="24"></i>';
+            if(tip.icon === 'music') iconHtml = '<i data-lucide="music" width="24"></i>';
+            if(tip.icon === 'smile') iconHtml = '<i data-lucide="smile" width="24"></i>';
+
+            container.className = `flex items-start p-4 rounded-xl ${tip.bg} transition-all duration-300`;
+            container.innerHTML = `
+                <div class="p-3 rounded-full bg-white shadow-sm ${tip.color} mr-4">
+                    ${iconHtml}
+                </div>
+                <div>
+                    <h4 class="font-bold text-lg mb-1 ${tip.color}">${tip.title}</h4>
+                    <p class="text-slate-700 leading-relaxed">${tip.content}</p>
+                    <p class="text-xs text-sub mt-2">From. 리더의 건강까지 생각하는 케밀리 🐶</p>
+                </div>
+            `;
+            lucide.createIcons();
+        }
+
+        function rotateTip() {
+            const btn = document.getElementById('refresh-icon');
+            btn.classList.add('animate-spin');
+            document.getElementById('care-section').classList.add('opacity-50');
+            
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * careTips.length);
+                renderCareTip(randomIndex);
+                btn.classList.remove('animate-spin');
+                document.getElementById('care-section').classList.remove('opacity-50');
+            }, 500);
+        }
+
+        // Initialization
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set Date
+            document.getElementById('current-date').innerText = new Date().toLocaleDateString();
+
+            // Insert Mascots
+            document.getElementById('mascot-small').innerHTML = getPuppySVG('happy', 35);
+            document.getElementById('mascot-dashboard').innerHTML = getPuppySVG('smart', 48);
+            document.getElementById('mascot-care').innerHTML = getPuppySVG('sleepy', 28);
+
+            // Init Data
+            renderCareTip(0);
+            renderFairness();
+
+            // Icons
+            lucide.createIcons();
+        });
+
+        // Mobile Sidebar Toggle
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('hidden');
+            sidebar.classList.toggle('absolute');
+            sidebar.classList.toggle('z-50');
+            sidebar.classList.toggle('h-full');
+        }
+    </script>
+</body>
+</html>
