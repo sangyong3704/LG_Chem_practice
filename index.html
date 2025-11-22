@@ -1,639 +1,1536 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI Leadership Balancer - B조</title>
-    
+
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
+    <!-- SheetJS (엑셀 업로드/다운로드용) -->
+    <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+
     <!-- Custom Colors Configuration -->
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        main: '#A50034', // R165 G0 B52
-                        sub: '#6B6B6B',  // R107 G107 B107
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              main: "#A50034", // R165 G0 B52
+              sub: "#6B6B6B", // R107 G107 B107
+            },
+          },
+        },
+      };
     </script>
 
     <style>
-        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
-        
-        body {
-            font-family: 'Pretendard', sans-serif;
-        }
+      @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css");
 
-        /* Scrollbar Custom */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #ccc; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #A50034; 
-        }
+      body {
+        font-family: "Pretendard", sans-serif;
+      }
 
-        .sidebar-item.active {
-            background-color: white;
-            color: #A50034;
-            font-weight: 700;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        
-        .sidebar-item:not(.active):hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
+      /* Scrollbar Custom */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #a50034;
+      }
 
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
+      .sidebar-item.active {
+        background-color: white;
+        color: #a50034;
+        font-weight: 700;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+      .sidebar-item:not(.active):hover {
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .fade-in {
+        animation: fadeIn 0.3s ease-in-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(5px);
         }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* =========================
+           학생 관리(엑셀) 화면 전용 스타일
+           원본 practice_for_excel_inputation 기반
+           ========================= */
+      .student-layout {
+        display: flex;
+        flex-direction: row;
+        gap: 24px;
+      }
+      .student-layout .card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        padding: 20px 24px;
+      }
+      .student-layout .form-card {
+        flex: 1;
+        max-width: 580px;
+      }
+      .student-layout h1 {
+        margin: 0 0 8px 0;
+        font-size: 24px;
+        font-weight: 700;
+      }
+      .student-layout h2 {
+        margin: 8px 0 16px 0;
+        font-size: 18px;
+      }
+      .student-layout .subtitle {
+        margin-bottom: 20px;
+        color: #666;
+        font-size: 13px;
+      }
+      .student-layout .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px 16px;
+      }
+      .student-layout .form-field {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        font-size: 13px;
+      }
+      .student-layout .form-field label {
+        font-weight: 600;
+      }
+      .student-layout .form-field span.hint {
+        font-size: 11px;
+        color: #888;
+      }
+      .student-layout input[type="text"],
+      .student-layout input[type="tel"],
+      .student-layout input[type="password"],
+      .student-layout select {
+        border-radius: 8px;
+        border: 1px solid #d4d7e5;
+        padding: 8px 10px;
+        font-size: 13px;
+        outline: none;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      }
+      .student-layout input:focus,
+      .student-layout select:focus {
+        border-color: #4460ff;
+        box-shadow: 0 0 0 2px rgba(68, 96, 255, 0.15);
+      }
+      .student-layout .form-actions {
+        margin-top: 18px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+      }
+      .student-layout button {
+        border: none;
+        border-radius: 999px;
+        padding: 10px 18px;
+        font-size: 13px;
+        cursor: pointer;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: transform 0.05s, box-shadow 0.1s, background 0.15s;
+      }
+      .student-layout #add-student-button {
+        background: #4460ff;
+        color: #fff;
+        box-shadow: 0 8px 16px rgba(68, 96, 255, 0.35);
+      }
+      .student-layout #add-student-button:hover {
+        background: #3650e0;
+      }
+      .student-layout #add-student-button:active {
+        transform: translateY(1px);
+        box-shadow: 0 4px 10px rgba(68, 96, 255, 0.3);
+      }
+      .student-layout .secondary-btn {
+        background: #eef1ff;
+        color: #3a4ad9;
+        box-shadow: none;
+      }
+      .student-layout .secondary-btn:hover {
+        background: #e1e6ff;
+      }
+      .student-layout .status-text {
+        font-size: 12px;
+        color: #666;
+      }
+
+      .student-list-panel {
+        position: relative;
+        width: 480px;
+        max-height: 600px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .student-list-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        gap: 8px;
+      }
+      .student-list-title {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .student-count-badge {
+        background: #eef1ff;
+        color: #3a4ad9;
+        border-radius: 999px;
+        padding: 3px 10px;
+        font-size: 11px;
+        font-weight: 600;
+      }
+      .student-table-container {
+        flex: 1;
+        overflow: auto;
+        border-radius: 12px;
+        border: 1px solid #e1e3f0;
+      }
+      .student-table-container table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 12px;
+      }
+      .student-table-container thead {
+        position: sticky;
+        top: 0;
+        background: #f4f5fd;
+        z-index: 1;
+      }
+      .student-table-container th,
+      .student-table-container td {
+        padding: 6px 8px;
+        border-bottom: 1px solid #eceef7;
+        text-align: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 120px;
+      }
+      .student-table-container th {
+        font-weight: 600;
+        font-size: 11px;
+        color: #555;
+      }
+      .student-table-container tbody tr:nth-child(even) {
+        background: #fcfcff;
+      }
+      .student-table-container tbody tr:hover {
+        background: #f1f3ff;
+      }
+      .student-layout #excel-bulk-input-area {
+        width: 99%;
+        min-height: 74px;
+        box-sizing: border-box;
+        resize: vertical;
+        background: #f1f5fa;
+        margin-top: 0.5em;
+        margin-bottom: 2px;
+      }
+
+      @media (max-width: 1100px) {
+        .student-layout {
+          flex-direction: column;
+        }
+        .student-layout .form-card {
+          max-width: 100%;
+        }
+        .student-list-panel {
+          width: 100%;
+          max-height: none;
+        }
+      }
     </style>
-</head>
-<body class="bg-slate-50 text-slate-900 h-screen flex overflow-hidden">
-
+  </head>
+  <body class="bg-slate-50 text-slate-900 h-screen flex overflow-hidden">
     <!-- Sidebar -->
-    <div class="w-64 bg-main text-white flex-shrink-0 flex flex-col transition-all duration-300 hidden md:flex" id="sidebar">
-        <div class="p-6 flex items-center justify-between">
-            <div class="flex items-center space-x-2">
-                <i data-lucide="brain" class="text-white" width="28" height="28"></i>
-                <span class="text-xl font-bold leading-tight">Leadership<br/>Balancer</span>
-            </div>
+    <div
+      class="w-64 bg-main text-white flex-shrink-0 flex flex-col transition-all duration-300 hidden md:flex"
+      id="sidebar"
+    >
+      <div class="p-6 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <i data-lucide="brain" class="text-white" width="28" height="28"></i>
+          <span class="text-xl font-bold leading-tight"
+            >Leadership<br />Balancer</span
+          >
         </div>
-        
-        <nav class="flex-1 px-4 space-y-2">
-            <button onclick="switchTab('dashboard')" class="sidebar-item active w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left">
-                <i data-lucide="layout-dashboard" width="20"></i>
-                <span>대시보드</span>
-            </button>
-            <button onclick="switchTab('fairness')" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left text-white/80">
-                <i data-lucide="scale" width="20"></i>
-                <span>공정성 확보</span>
-            </button>
-            <button onclick="switchTab('relationship')" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left text-white/80">
-                <i data-lucide="message-circle-heart" width="20"></i>
-                <span>관계 개선</span>
-            </button>
-            <button onclick="switchTab('time')" class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left text-white/80">
-                <i data-lucide="clock" width="20"></i>
-                <span>시간 확보</span>
-            </button>
-        </nav>
+      </div>
 
-        <div class="p-6 border-t border-white/20">
-            <div class="bg-black/20 p-4 rounded-lg relative">
-                <div class="flex justify-between items-center mb-2">
-                   <p class="text-xs text-white/80">나의 리더십 에너지</p>
-                   <i data-lucide="help-circle" width="12" class="text-white/60 cursor-pointer"></i>
-                </div>
-                
-                <div class="flex items-center space-x-3">
-                   <div id="mascot-small"></div>
-                   <div class="flex-1">
-                      <div class="flex items-end space-x-2 mb-1">
-                        <span class="text-2xl font-bold text-green-400">85%</span>
-                        <span class="text-xs text-green-400 mb-1">▲ 안정적</span>
-                      </div>
-                      <div class="w-full bg-black/30 rounded-full h-2">
-                        <div class="bg-green-400 h-2 rounded-full" style="width: 85%"></div>
-                      </div>
-                   </div>
-                </div>
-                <p class="text-[10px] text-white/70 mt-2 text-center">"리더님! 오늘도 아주 훌륭해요! 🐶"</p>
+      <nav class="flex-1 px-4 space-y-2">
+        <button
+          onclick="switchTab('dashboard')"
+          class="sidebar-item active w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left"
+        >
+          <i data-lucide="layout-dashboard" width="20"></i>
+          <span>대시보드</span>
+        </button>
+        <button
+          onclick="switchTab('fairness')"
+          class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left text-white/80"
+        >
+          <i data-lucide="scale" width="20"></i>
+          <span>공정성 확보</span>
+        </button>
+        <button
+          onclick="switchTab('relationship')"
+          class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left text-white/80"
+        >
+          <i data-lucide="message-circle-heart" width="20"></i>
+          <span>관계 개선</span>
+        </button>
+        <button
+          onclick="switchTab('time')"
+          class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left text-white/80"
+        >
+          <i data-lucide="clock" width="20"></i>
+          <span>시간 확보</span>
+        </button>
+        <!-- 새 탭: 학생 관리 -->
+        <button
+          onclick="switchTab('students')"
+          class="sidebar-item w-full flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors text-left text-white/80"
+        >
+          <i data-lucide="users" width="20"></i>
+          <span>학생 관리</span>
+        </button>
+      </nav>
+
+      <div class="p-6 border-t border-white/20">
+        <div class="bg-black/20 p-4 rounded-lg relative">
+          <div class="flex justify-between items-center mb-2">
+            <p class="text-xs text-white/80">나의 리더십 에너지</p>
+            <i
+              data-lucide="help-circle"
+              width="12"
+              class="text-white/60 cursor-pointer"
+            ></i>
+          </div>
+
+          <div class="flex items-center space-x-3">
+            <div id="mascot-small"></div>
+            <div class="flex-1">
+              <div class="flex items-end space-x-2 mb-1">
+                <span class="text-2xl font-bold text-green-400">85%</span>
+                <span class="text-xs text-green-400 mb-1">▲ 안정적</span>
+              </div>
+              <div class="w-full bg-black/30 rounded-full h-2">
+                <div
+                  class="bg-green-400 h-2 rounded-full"
+                  style="width: 85%"
+                ></div>
+              </div>
             </div>
+          </div>
+          <p class="text-[10px] text-white/70 mt-2 text-center">
+            "리더님! 오늘도 아주 훌륭해요! 🐶"
+          </p>
         </div>
+      </div>
     </div>
 
     <!-- Main Content -->
     <div class="flex-1 flex flex-col h-full overflow-hidden relative">
-        
-        <!-- Mobile Header -->
-        <header class="md:hidden bg-white border-b border-slate-200 p-4 flex justify-between items-center z-10">
-            <div class="flex items-center space-x-2">
-                <i data-lucide="brain" class="text-main"></i>
-                <span class="font-bold text-lg text-main">Leadership Balancer</span>
+      <!-- Mobile Header -->
+      <header
+        class="md:hidden bg-white border-b border-slate-200 p-4 flex justify-between items-center z-10"
+      >
+        <div class="flex items-center space-x-2">
+          <i data-lucide="brain" class="text-main"></i>
+          <span class="font-bold text-lg text-main">Leadership Balancer</span>
+        </div>
+        <button onclick="toggleSidebar()" class="text-sub">
+          <i data-lucide="menu"></i>
+        </button>
+      </header>
+
+      <!-- Main Scroll Area -->
+      <main class="flex-1 overflow-auto p-4 md:p-8 bg-slate-50">
+        <div class="max-w-6xl mx-auto h-full" id="content-area">
+          <!-- 1. Dashboard View -->
+          <div id="view-dashboard" class="fade-in space-y-6">
+            <header
+              class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-100"
+            >
+              <div class="flex items-center space-x-4">
+                <div
+                  class="bg-yellow-100 p-2 rounded-full"
+                  id="mascot-dashboard"
+                ></div>
+                <div>
+                  <h2 class="text-2xl font-bold text-slate-800">
+                    B조세계최고 리더님, 반가워요! 🐾
+                  </h2>
+                  <p class="text-sm text-sub mt-1">
+                    AI 팩트 시트와 골든타임 알림으로 오늘도 팀을 완벽하게
+                    케어해볼까요?
+                  </p>
+                </div>
+              </div>
+              <span
+                class="text-sm text-sub bg-slate-50 px-3 py-1 rounded-full"
+                id="current-date"
+              ></span>
+            </header>
+
+            <!-- KPI Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div
+                class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <div class="p-3 bg-main/10 text-main rounded-lg">
+                    <i data-lucide="scale" width="24"></i>
+                  </div>
+                  <span
+                    class="text-xs font-medium text-sub bg-slate-100 px-2 py-1 rounded"
+                    >업데이트 필요</span
+                  >
+                </div>
+                <h3 class="text-lg font-semibold text-slate-700 mb-1">
+                  성과 객관화
+                </h3>
+                <p class="text-sm text-sub">
+                  4명의 팀원에 대한<br />난이도 보정 데이터가 있습니다.
+                </p>
+                <button
+                  onclick="switchTab('fairness')"
+                  class="mt-4 text-sm text-main font-medium flex items-center hover:underline"
+                >
+                  확인하기
+                  <i data-lucide="chevron-right" width="16" class="ml-1"></i>
+                </button>
+              </div>
+
+              <div
+                class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <div class="p-3 bg-pink-50 text-pink-600 rounded-lg">
+                    <i data-lucide="message-circle-heart" width="24"></i>
+                  </div>
+                  <span
+                    class="text-xs font-medium text-pink-600 bg-pink-50 px-2 py-1 rounded animate-pulse"
+                    >4건 대기중</span
+                  >
+                </div>
+                <h3 class="text-lg font-semibold text-slate-700 mb-1">
+                  피드백 골든타임
+                </h3>
+                <p class="text-sm text-sub">
+                  칭찬 타이밍을 놓치지 마세요.<br />지금 메시지를 보내보세요.
+                </p>
+                <button
+                  onclick="switchTab('relationship')"
+                  class="mt-4 text-sm text-pink-600 font-medium flex items-center hover:underline"
+                >
+                  메시지 작성
+                  <i data-lucide="chevron-right" width="16" class="ml-1"></i>
+                </button>
+              </div>
+
+              <div
+                class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow"
+              >
+                <div class="flex items-center justify-between mb-4">
+                  <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
+                    <i data-lucide="clock" width="24"></i>
+                  </div>
+                </div>
+                <h3 class="text-lg font-semibold text-slate-700 mb-1">
+                  스마트 워크로드
+                </h3>
+                <p class="text-sm text-sub">
+                  읽지 않은 보고서 2건 요약 완료.<br />회의 일정 충돌 1건 감지.
+                </p>
+                <button
+                  onclick="switchTab('time')"
+                  class="mt-4 text-sm text-indigo-600 font-medium flex items-center hover:underline"
+                >
+                  일정 조율하기
+                  <i data-lucide="chevron-right" width="16" class="ml-1"></i>
+                </button>
+              </div>
             </div>
-            <button onclick="toggleSidebar()" class="text-sub">
-                <i data-lucide="menu"></i>
-            </button>
-        </header>
 
-        <!-- Main Scroll Area -->
-        <main class="flex-1 overflow-auto p-4 md:p-8 bg-slate-50">
-            <div class="max-w-6xl mx-auto h-full" id="content-area">
-                
-                <!-- 1. Dashboard View -->
-                <div id="view-dashboard" class="fade-in space-y-6">
-                    <header class="flex justify-between items-center bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-                        <div class="flex items-center space-x-4">
-                            <div class="bg-yellow-100 p-2 rounded-full" id="mascot-dashboard"></div>
-                            <div>
-                                <h2 class="text-2xl font-bold text-slate-800">B조세계최고 리더님, 반가워요! 🐾</h2>
-                                <p class="text-sm text-sub mt-1">AI 팩트 시트와 골든타임 알림으로 오늘도 팀을 완벽하게 케어해볼까요?</p>
-                            </div>
-                        </div>
-                        <span class="text-sm text-sub bg-slate-50 px-3 py-1 rounded-full" id="current-date"></span>
-                    </header>
-
-                    <!-- KPI Cards -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="p-3 bg-main/10 text-main rounded-lg">
-                                    <i data-lucide="scale" width="24"></i>
-                                </div>
-                                <span class="text-xs font-medium text-sub bg-slate-100 px-2 py-1 rounded">업데이트 필요</span>
-                            </div>
-                            <h3 class="text-lg font-semibold text-slate-700 mb-1">성과 객관화</h3>
-                            <p class="text-sm text-sub">4명의 팀원에 대한<br/>난이도 보정 데이터가 있습니다.</p>
-                            <button onclick="switchTab('fairness')" class="mt-4 text-sm text-main font-medium flex items-center hover:underline">
-                                확인하기 <i data-lucide="chevron-right" width="16" class="ml-1"></i>
-                            </button>
-                        </div>
-
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="p-3 bg-pink-50 text-pink-600 rounded-lg">
-                                    <i data-lucide="message-circle-heart" width="24"></i>
-                                </div>
-                                <span class="text-xs font-medium text-pink-600 bg-pink-50 px-2 py-1 rounded animate-pulse">4건 대기중</span>
-                            </div>
-                            <h3 class="text-lg font-semibold text-slate-700 mb-1">피드백 골든타임</h3>
-                            <p class="text-sm text-sub">칭찬 타이밍을 놓치지 마세요.<br/>지금 메시지를 보내보세요.</p>
-                            <button onclick="switchTab('relationship')" class="mt-4 text-sm text-pink-600 font-medium flex items-center hover:underline">
-                                메시지 작성 <i data-lucide="chevron-right" width="16" class="ml-1"></i>
-                            </button>
-                        </div>
-
-                        <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 hover:shadow-md transition-shadow">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="p-3 bg-indigo-50 text-indigo-600 rounded-lg">
-                                    <i data-lucide="clock" width="24"></i>
-                                </div>
-                            </div>
-                            <h3 class="text-lg font-semibold text-slate-700 mb-1">스마트 워크로드</h3>
-                            <p class="text-sm text-sub">읽지 않은 보고서 2건 요약 완료.<br/>회의 일정 충돌 1건 감지.</p>
-                            <button onclick="switchTab('time')" class="mt-4 text-sm text-indigo-600 font-medium flex items-center hover:underline">
-                                일정 조율하기 <i data-lucide="chevron-right" width="16" class="ml-1"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Leader Care Section -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 transition-opacity duration-500" id="care-section">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-lg font-bold text-slate-800 flex items-center">
-                                <span id="mascot-care" class="mr-2"></span>
-                                <span>🌿 리더를 위한 힐링 한 조각</span>
-                            </h3>
-                            <button onclick="rotateTip()" class="text-xs flex items-center text-sub hover:text-slate-800 transition-colors">
-                                <i data-lucide="refresh-cw" width="14" class="mr-1" id="refresh-icon"></i>
-                                다른 꿀팁 보기
-                            </button>
-                        </div>
-                        <div id="care-content-area" class="flex items-start p-4 rounded-xl bg-amber-50">
-                            <!-- Dynamic Content -->
-                        </div>
-                    </div>
-
-                    <!-- Recent Alerts -->
-                    <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                        <h3 class="text-lg font-bold text-slate-800 mb-4">최근 AI 알림</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-start space-x-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                                <div class="mt-1 p-2 rounded-full bg-green-100 text-green-600">
-                                    <i data-lucide="check-circle-2" width="18"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <h4 class="font-semibold text-slate-800">칭찬 추천</h4>
-                                        <span class="text-xs text-sub">10분 전</span>
-                                    </div>
-                                    <p class="text-sm text-slate-600 mb-2"><strong>하유림</strong>님이 예정보다 2일 빠르게 핵심 난제를 해결했습니다. 칭찬할 골든타임입니다!</p>
-                                    <button onclick="setFeedbackTarget('하유림'); switchTab('relationship');" class="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm hover:bg-slate-50 text-sub font-medium">AI 초안 보기</button>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-start space-x-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
-                                <div class="mt-1 p-2 rounded-full bg-green-100 text-green-600">
-                                    <i data-lucide="check-circle-2" width="18"></i>
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex justify-between items-center mb-1">
-                                        <h4 class="font-semibold text-slate-800">리더십 격려</h4>
-                                        <span class="text-xs text-sub">2시간 전</span>
-                                    </div>
-                                    <p class="text-sm text-slate-600 mb-2"><strong>박태희</strong>님이 전사 발표를 성공적으로 마쳤습니다. 리더십에 대한 격려 메시지를 보내보세요.</p>
-                                    <button onclick="setFeedbackTarget('박태희'); switchTab('relationship');" class="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm hover:bg-slate-50 text-sub font-medium">AI 초안 보기</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 2. Fairness Module View -->
-                <div id="view-fairness" class="hidden fade-in h-full flex flex-col space-y-6">
-                    <header>
-                        <h2 class="text-2xl font-bold text-slate-800 mb-1">AI 성과 객관화 팩트 시트</h2>
-                        <p class="text-sub">정성적 데이터를 분석하여 난이도를 보정하고 객관적인 성과 지표를 제공합니다.</p>
-                    </header>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
-                        <!-- Team List -->
-                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-                            <h3 class="font-semibold text-slate-700 mb-4 px-2">팀원 목록</h3>
-                            <div class="space-y-2" id="team-list-container"></div>
-                        </div>
-
-                        <!-- Detail View -->
-                        <div class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col" id="fairness-detail"></div>
-                    </div>
-                </div>
-
-                <!-- 3. Relationship Module View -->
-                <div id="view-relationship" class="hidden fade-in h-full flex flex-col space-y-6">
-                    <header>
-                        <h2 class="text-2xl font-bold text-slate-800 mb-1">피드백 골든타임 코치</h2>
-                        <p class="text-sub">놓치기 쉬운 칭찬 타이밍을 잡고, 상황에 맞는 완벽한 메시지를 AI가 제안합니다.</p>
-                    </header>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- Alerts -->
-                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                            <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
-                                <i data-lucide="bell" width="18" class="mr-2 text-pink-500"></i>
-                                피드백 추천 알림
-                            </h3>
-                            <div class="space-y-4 overflow-y-auto max-h-[400px] pr-2">
-                                <!-- Ha Yu-rim -->
-                                <div id="alert-hayurim" class="p-4 border bg-pink-50 border-pink-100 ring-2 ring-pink-200 rounded-lg cursor-pointer transition-all mb-3" onclick="setFeedbackTarget('하유림')">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <span class="font-bold text-slate-800">하유림 (슈퍼 크랙)</span>
-                                        <span class="text-xs text-pink-600 bg-white px-2 py-1 rounded-full font-medium">즉시 칭찬 필요</span>
-                                    </div>
-                                    <p class="text-sm text-slate-700 mb-3">마감일보다 2일 일찍 업무를 완료했습니다. 지금 칭찬하면 동기부여 효과가 200% 상승합니다.</p>
-                                    <div class="text-xs text-sub">발생 시각: 10분 전</div>
-                                </div>
-                                
-                                <!-- Park Tae-hee -->
-                                <div id="alert-parktaehee" class="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer transition-all mb-3" onclick="setFeedbackTarget('박태희')">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <span class="font-bold text-slate-800">박태희 (멋진 팀장님)</span>
-                                        <span class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium">리더십 격려</span>
-                                    </div>
-                                    <p class="text-sm text-slate-700 mb-3">전사 비전 발표를 성공적으로 마쳤습니다. 멋진 리딩에 대해 감사를 표해보세요.</p>
-                                    <div class="text-xs text-sub">발생 시각: 2시간 전</div>
-                                </div>
-
-                                <!-- Park Jeong-ho -->
-                                <div id="alert-parkjeongho" class="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer transition-all mb-3" onclick="setFeedbackTarget('박정호')">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <span class="font-bold text-slate-800">박정호 (우리조 샤크)</span>
-                                        <span class="text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full font-medium">인사이트 인정</span>
-                                    </div>
-                                    <p class="text-sm text-slate-700 mb-3">경쟁사 분석 리포트에서 놀라운 통찰력을 보여주었습니다. 전문성을 인정해 주세요.</p>
-                                    <div class="text-xs text-sub">발생 시각: 4시간 전</div>
-                                </div>
-
-                                <!-- Park Jae-hyun -->
-                                <div id="alert-parkjaehyun" class="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer transition-all" onclick="setFeedbackTarget('박재현')">
-                                    <div class="flex justify-between items-start mb-2">
-                                        <span class="font-bold text-slate-800">박재현 (분위기 메이커)</span>
-                                        <span class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full">분위기 메이커</span>
-                                    </div>
-                                    <p class="text-sm text-slate-700 mb-3">팀 이벤트 기획으로 고생하셨습니다. 밝은 에너지에 대해 감사를 전하세요.</p>
-                                    <div class="text-xs text-sub">발생 시각: 9시간 전</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Generator -->
-                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col">
-                            <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
-                                <i data-lucide="brain" width="18" class="mr-2 text-main"></i>
-                                <span id="generator-title">AI 메시지 생성기 (하유림님)</span>
-                            </h3>
-                            
-                            <div class="flex space-x-2 mb-4">
-                                <button onclick="generateMessage('formal')" class="flex-1 py-2 text-sm rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">정중한/공식적</button>
-                                <button onclick="generateMessage('friendly')" class="flex-1 py-2 text-sm rounded-lg border border-main bg-main text-white">친근한/부드러운</button>
-                                <button onclick="generateMessage('cheer')" class="flex-1 py-2 text-sm rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors">격려/에너지</button>
-                            </div>
-
-                            <div class="flex-1 bg-slate-50 rounded-lg border border-slate-200 p-4 mb-4 relative min-h-[150px]" id="message-area">
-                                <textarea class="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed outline-none" id="message-input">위 버튼을 눌러 AI에게 초안 작성을 요청하세요.</textarea>
-                            </div>
-
-                            <button class="w-full bg-main hover:bg-red-800 text-white py-3 rounded-lg font-medium flex items-center justify-center transition-colors">
-                                <i data-lucide="send" width="18" class="mr-2"></i>
-                                메신저로 전송하기
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 4. Time Module View -->
-                <div id="view-time" class="hidden fade-in h-full flex flex-col space-y-6">
-                    <header>
-                        <h2 class="text-2xl font-bold text-slate-800 mb-1">스마트 워크로드 매니저</h2>
-                        <p class="text-sub">행정 업무 자동화와 정보 검색 지원으로 리더의 전략적 시간을 확보합니다.</p>
-                    </header>
-
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <!-- News Section -->
-                        <div class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                            <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
-                                <i data-lucide="newspaper" width="18" class="mr-2 text-orange-500"></i>
-                                🌞 모닝 AI 브리핑 (산업 뉴스 & 키워드)
-                            </h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <!-- News List -->
-                                <div class="space-y-3">
-                                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors">
-                                        <div class="flex items-center mb-1">
-                                            <span class="text-[10px] font-bold bg-white border border-slate-200 px-1.5 py-0.5 rounded text-sub mr-2">경쟁사 동향</span>
-                                            <h4 class="text-sm font-bold text-slate-800 truncate">글로벌 배터리 시장, 전고체 기술 경쟁 심화</h4>
-                                        </div>
-                                        <p class="text-xs text-slate-600 leading-relaxed line-clamp-2">주요 경쟁사들이 2027년 양산을 목표로 R&D 투자를 15% 확대했습니다. 차세대 라인 선점이 관건입니다.</p>
-                                    </div>
-                                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors">
-                                        <div class="flex items-center mb-1">
-                                            <span class="text-[10px] font-bold bg-white border border-slate-200 px-1.5 py-0.5 rounded text-sub mr-2">기술 트렌드</span>
-                                            <h4 class="text-sm font-bold text-slate-800 truncate">생성형 AI, 제조업 공정 효율 30% 개선 사례</h4>
-                                        </div>
-                                        <p class="text-xs text-slate-600 leading-relaxed line-clamp-2">스마트 팩토리 도입 기업들의 데이터 분석 시간이 획기적으로 단축되었습니다. 도입 검토가 시급합니다.</p>
-                                    </div>
-                                    <div class="p-3 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors">
-                                        <div class="flex items-center mb-1">
-                                            <span class="text-[10px] font-bold bg-white border border-slate-200 px-1.5 py-0.5 rounded text-sub mr-2">규제/정책</span>
-                                            <h4 class="text-sm font-bold text-slate-800 truncate">ESG 공시 의무화, 공급망 관리 비상</h4>
-                                        </div>
-                                        <p class="text-xs text-slate-600 leading-relaxed line-clamp-2">협력사 탄소 배출량 데이터 확보가 필수 과제로 떠올랐습니다. 구매팀과 연계한 대응 전략이 필요합니다.</p>
-                                    </div>
-                                </div>
-                                
-                                <!-- Keywords & Chart Placeholder -->
-                                <div class="flex flex-col">
-                                    <div class="mb-4">
-                                        <h4 class="text-xs font-bold text-sub mb-2 flex items-center">
-                                            <i data-lucide="trending-up" width="14" class="mr-1"></i> 실시간 트렌드 키워드
-                                        </h4>
-                                        <div class="flex flex-wrap gap-2">
-                                            <span class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer">#전고체배터리</span>
-                                            <span class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer">#DX가속화</span>
-                                            <span class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer">#탄소국경세</span>
-                                            <span class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer">#애자일조직</span>
-                                            <span class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer">#생성형AI</span>
-                                        </div>
-                                    </div>
-                                    <div class="flex-1 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center p-4">
-                                        <div class="text-center">
-                                            <i data-lucide="bar-chart-3" width="24" class="mx-auto text-slate-300 mb-2"></i>
-                                            <p class="text-xs text-slate-400">키워드 언급량 분석 차트<br/>(데이터 수집 중...)</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Document Summarizer -->
-                        <div class="lg:col-span-2 space-y-6">
-                            <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6">
-                                <h3 class="font-semibold text-slate-700 mb-4 flex items-center justify-between">
-                                    <div class="flex items-center">
-                                        <i data-lucide="file-text" width="18" class="mr-2 text-indigo-500"></i>
-                                        문서/메일 AI 요약
-                                    </div>
-                                    <span class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded">2건 처리 완료</span>
-                                </h3>
-                                <div class="space-y-4">
-                                    <div class="border border-slate-200 rounded-lg p-4">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <div class="flex items-center space-x-2">
-                                                <span class="font-bold text-slate-800">Q3 시장 동향 분석 보고서</span>
-                                                <span class="text-xs text-sub">(24 pages)</span>
-                                            </div>
-                                            <button class="text-xs text-sub underline">원본 보기</button>
-                                        </div>
-                                        <div class="bg-slate-50 p-3 rounded text-sm text-slate-700 leading-relaxed">
-                                            <span class="inline-block bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded mr-2 align-middle">AI 요약</span>
-                                            경쟁사 A의 점유율이 5% 상승함에 따라 모바일 타겟 마케팅 강화 필요. R&D 예산 10% 증액 제안.
-                                        </div>
-                                    </div>
-                                    <div class="border border-slate-200 rounded-lg p-4">
-                                        <div class="flex justify-between items-start mb-2">
-                                            <div class="flex items-center space-x-2">
-                                                <span class="font-bold text-slate-800">서버 장애 대응 메뉴얼</span>
-                                                <span class="text-xs text-sub">(15 pages)</span>
-                                            </div>
-                                            <button class="text-xs text-sub underline">원본 보기</button>
-                                        </div>
-                                        <div class="bg-slate-50 p-3 rounded text-sm text-slate-700 leading-relaxed">
-                                            <span class="inline-block bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded mr-2 align-middle">AI 요약</span>
-                                            장애 발생 시 L1 대응팀 15분 내 소집, L2 에스컬레이션 기준 구체화 필요.
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 h-fit">
-                            <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
-                                <i data-lucide="calendar" width="18" class="mr-2 text-orange-500"></i>
-                                스마트 일정 관리
-                            </h3>
-                            
-                            <div class="mb-6">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="text-sm font-medium text-slate-600">오늘의 일정 충돌 감지</span>
-                                    <span class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold">1건</span>
-                                </div>
-                                <div class="p-3 border-l-4 border-red-400 bg-red-50 rounded-r-lg">
-                                    <p class="text-sm font-bold text-slate-800">14:00 팀 주간회의</p>
-                                    <p class="text-sm text-sub">vs 경영진 긴급 보고</p>
-                                    <div class="mt-3 bg-white p-2 rounded border border-red-100">
-                                        <p class="text-xs text-slate-500 mb-1">🤖 AI 조율안 추천</p>
-                                        <p class="text-xs text-slate-800 font-medium">팀 주간회의를 내일 오전 10시로 변경하고, 메일로 사전 공지 발송.</p>
-                                        <button class="mt-2 w-full bg-red-500 text-white text-xs py-1.5 rounded hover:bg-red-600">이대로 조율하기</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+            <!-- Leader Care Section -->
+            <div
+              class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 transition-opacity duration-500"
+              id="care-section"
+            >
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold text-slate-800 flex items-center">
+                  <span id="mascot-care" class="mr-2"></span>
+                  <span>🌿 리더를 위한 힐링 한 조각</span>
+                </h3>
+                <button
+                  onclick="rotateTip()"
+                  class="text-xs flex items-center text-sub hover:text-slate-800 transition-colors"
+                >
+                  <i
+                    data-lucide="refresh-cw"
+                    width="14"
+                    class="mr-1"
+                    id="refresh-icon"
+                  ></i>
+                  다른 꿀팁 보기
+                </button>
+              </div>
+              <div
+                id="care-content-area"
+                class="flex items-start p-4 rounded-xl bg-amber-50"
+              >
+                <!-- Dynamic Content -->
+              </div>
             </div>
-        </main>
+
+            <!-- Recent Alerts -->
+            <div
+              class="bg-white rounded-xl shadow-sm border border-slate-100 p-6"
+            >
+              <h3 class="text-lg font-bold text-slate-800 mb-4">
+                최근 AI 알림
+              </h3>
+              <div class="space-y-4">
+                <div
+                  class="flex items-start space-x-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                >
+                  <div
+                    class="mt-1 p-2 rounded-full bg-green-100 text-green-600"
+                  >
+                    <i data-lucide="check-circle-2" width="18"></i>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                      <h4 class="font-semibold text-slate-800">칭찬 추천</h4>
+                      <span class="text-xs text-sub">10분 전</span>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-2">
+                      <strong>하유림</strong>님이 예정보다 2일 빠르게 핵심
+                      난제를 해결했습니다. 칭찬할 골든타임입니다!
+                    </p>
+                    <button
+                      onclick="setFeedbackTarget('하유림'); switchTab('relationship');"
+                      class="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm hover:bg-slate-50 text-sub font-medium"
+                    >
+                      AI 초안 보기
+                    </button>
+                  </div>
+                </div>
+
+                <div
+                  class="flex items-start space-x-4 p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors"
+                >
+                  <div
+                    class="mt-1 p-2 rounded-full bg-green-100 text-green-600"
+                  >
+                    <i data-lucide="check-circle-2" width="18"></i>
+                  </div>
+                  <div class="flex-1">
+                    <div class="flex justify-between items-center mb-1">
+                      <h4 class="font-semibold text-slate-800">리더십 격려</h4>
+                      <span class="text-xs text-sub">2시간 전</span>
+                    </div>
+                    <p class="text-sm text-slate-600 mb-2">
+                      <strong>박태희</strong>님이 전사 발표를 성공적으로
+                      마쳤습니다. 리더십에 대한 격려 메시지를 보내보세요.
+                    </p>
+                    <button
+                      onclick="setFeedbackTarget('박태희'); switchTab('relationship');"
+                      class="text-xs bg-white border border-slate-200 px-3 py-1.5 rounded shadow-sm hover:bg-slate-50 text-sub font-medium"
+                    >
+                      AI 초안 보기
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. Fairness Module View -->
+          <div
+            id="view-fairness"
+            class="hidden fade-in h-full flex flex-col space-y-6"
+          >
+            <header>
+              <h2 class="text-2xl font-bold text-slate-800 mb-1">
+                AI 성과 객관화 팩트 시트
+              </h2>
+              <p class="text-sub">
+                정성적 데이터를 분석하여 난이도를 보정하고 객관적인 성과 지표를
+                제공합니다.
+              </p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+              <!-- Team List -->
+              <div
+                class="bg-white rounded-xl shadow-sm border border-slate-100 p-4"
+              >
+                <h3 class="font-semibold text-slate-700 mb-4 px-2">
+                  팀원 목록
+                </h3>
+                <div class="space-y-2" id="team-list-container"></div>
+              </div>
+
+              <!-- Detail View -->
+              <div
+                class="lg:col-span-2 bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col"
+                id="fairness-detail"
+              ></div>
+            </div>
+          </div>
+
+          <!-- 3. Relationship Module View -->
+          <div
+            id="view-relationship"
+            class="hidden fade-in h-full flex flex-col space-y-6"
+          >
+            <header>
+              <h2 class="text-2xl font-bold text-slate-800 mb-1">
+                피드백 골든타임 코치
+              </h2>
+              <p class="text-sub">
+                놓치기 쉬운 칭찬 타이밍을 잡고, 상황에 맞는 완벽한 메시지를 AI가
+                제안합니다.
+              </p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <!-- Alerts -->
+              <div
+                class="bg-white rounded-xl shadow-sm border border-slate-100 p-6"
+              >
+                <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
+                  <i
+                    data-lucide="bell"
+                    width="18"
+                    class="mr-2 text-pink-500"
+                  ></i>
+                  피드백 추천 알림
+                </h3>
+                <div class="space-y-4 overflow-y-auto max-h-[400px] pr-2">
+                  <!-- Ha Yu-rim -->
+                  <div
+                    id="alert-hayurim"
+                    class="p-4 border bg-pink-50 border-pink-100 ring-2 ring-pink-200 rounded-lg cursor-pointer transition-all mb-3"
+                    onclick="setFeedbackTarget('하유림')"
+                  >
+                    <div class="flex justify-between items-start mb-2">
+                      <span class="font-bold text-slate-800"
+                        >하유림 (슈퍼 크랙)</span
+                      >
+                      <span
+                        class="text-xs text-pink-600 bg-white px-2 py-1 rounded-full font-medium"
+                        >즉시 칭찬 필요</span
+                      >
+                    </div>
+                    <p class="text-sm text-slate-700 mb-3">
+                      마감일보다 2일 일찍 업무를 완료했습니다. 지금 칭찬하면
+                      동기부여 효과가 200% 상승합니다.
+                    </p>
+                    <div class="text-xs text-sub">발생 시각: 10분 전</div>
+                  </div>
+
+                  <!-- Park Tae-hee -->
+                  <div
+                    id="alert-parktaehee"
+                    class="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer transition-all mb-3"
+                    onclick="setFeedbackTarget('박태희')"
+                  >
+                    <div class="flex justify-between items-start mb-2">
+                      <span class="font-bold text-slate-800"
+                        >박태희 (멋진 팀장님)</span
+                      >
+                      <span
+                        class="text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full font-medium"
+                        >리더십 격려</span
+                      >
+                    </div>
+                    <p class="text-sm text-slate-700 mb-3">
+                      전사 비전 발표를 성공적으로 마쳤습니다. 멋진 리딩에 대해
+                      감사를 표해보세요.
+                    </p>
+                    <div class="text-xs text-sub">발생 시각: 2시간 전</div>
+                  </div>
+
+                  <!-- Park Jeong-ho -->
+                  <div
+                    id="alert-parkjeongho"
+                    class="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer transition-all mb-3"
+                    onclick="setFeedbackTarget('박정호')"
+                  >
+                    <div class="flex justify-between items-start mb-2">
+                      <span class="font-bold text-slate-800"
+                        >박정호 (우리조 샤크)</span
+                      >
+                      <span
+                        class="text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded-full font-medium"
+                        >인사이트 인정</span
+                      >
+                    </div>
+                    <p class="text-sm text-slate-700 mb-3">
+                      경쟁사 분석 리포트에서 놀라운 통찰력을 보여주었습니다.
+                      전문성을 인정해 주세요.
+                    </p>
+                    <div class="text-xs text-sub">발생 시각: 4시간 전</div>
+                  </div>
+
+                  <!-- Park Jae-hyun -->
+                  <div
+                    id="alert-parkjaehyun"
+                    class="p-4 border border-slate-200 bg-white rounded-lg hover:bg-slate-50 cursor-pointer transition-all"
+                    onclick="setFeedbackTarget('박재현')"
+                  >
+                    <div class="flex justify-between items-start mb-2">
+                      <span class="font-bold text-slate-800"
+                        >박재현 (분위기 메이커)</span
+                      >
+                      <span
+                        class="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full"
+                        >분위기 메이커</span
+                      >
+                    </div>
+                    <p class="text-sm text-slate-700 mb-3">
+                      팀 이벤트 기획으로 고생하셨습니다. 밝은 에너지에 대해
+                      감사를 전하세요.
+                    </p>
+                    <div class="text-xs text-sub">발생 시각: 9시간 전</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Generator -->
+              <div
+                class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 flex flex-col"
+              >
+                <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
+                  <i data-lucide="brain" width="18" class="mr-2 text-main"></i>
+                  <span id="generator-title">AI 메시지 생성기 (하유림님)</span>
+                </h3>
+
+                <div class="flex space-x-2 mb-4">
+                  <button
+                    onclick="generateMessage('formal')"
+                    class="flex-1 py-2 text-sm rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                  >
+                    정중한/공식적
+                  </button>
+                  <button
+                    onclick="generateMessage('friendly')"
+                    class="flex-1 py-2 text-sm rounded-lg border border-main bg-main text-white"
+                  >
+                    친근한/부드러운
+                  </button>
+                  <button
+                    onclick="generateMessage('cheer')"
+                    class="flex-1 py-2 text-sm rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
+                  >
+                    격려/에너지
+                  </button>
+                </div>
+
+                <div
+                  class="flex-1 bg-slate-50 rounded-lg border border-slate-200 p-4 mb-4 relative min-h-[150px]"
+                  id="message-area"
+                >
+                  <textarea
+                    class="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed outline-none"
+                    id="message-input"
+                  >
+위 버튼을 눌러 AI에게 초안 작성을 요청하세요.</textarea
+                  >
+                </div>
+
+                <button
+                  class="w-full bg-main hover:bg-red-800 text-white py-3 rounded-lg font-medium flex items-center justify-center transition-colors"
+                >
+                  <i data-lucide="send" width="18" class="mr-2"></i>
+                  메신저로 전송하기
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 4. Time Module View -->
+          <div
+            id="view-time"
+            class="hidden fade-in h-full flex flex-col space-y-6"
+          >
+            <header>
+              <h2 class="text-2xl font-bold text-slate-800 mb-1">
+                스마트 워크로드 매니저
+              </h2>
+              <p class="text-sub">
+                행정 업무 자동화와 정보 검색 지원으로 리더의 전략적 시간을
+                확보합니다.
+              </p>
+            </header>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <!-- News Section -->
+              <div
+                class="lg:col-span-3 bg-white rounded-xl shadow-sm border border-slate-100 p-6"
+              >
+                <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
+                  <i
+                    data-lucide="newspaper"
+                    width="18"
+                    class="mr-2 text-orange-500"
+                  ></i>
+                  🌞 모닝 AI 브리핑 (산업 뉴스 & 키워드)
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <!-- News List -->
+                  <div class="space-y-3">
+                    <div
+                      class="p-3 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors"
+                    >
+                      <div class="flex items-center mb-1">
+                        <span
+                          class="text-[10px] font-bold bg-white border border-slate-200 px-1.5 py-0.5 rounded text-sub mr-2"
+                          >경쟁사 동향</span
+                        >
+                        <h4 class="text-sm font-bold text-slate-800 truncate">
+                          글로벌 배터리 시장, 전고체 기술 경쟁 심화
+                        </h4>
+                      </div>
+                      <p
+                        class="text-xs text-slate-600 leading-relaxed line-clamp-2"
+                      >
+                        주요 경쟁사들이 2027년 양산을 목표로 R&D 투자를 15%
+                        확대했습니다. 차세대 라인 선점이 관건입니다.
+                      </p>
+                    </div>
+                    <div
+                      class="p-3 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors"
+                    >
+                      <div class="flex items-center mb-1">
+                        <span
+                          class="text-[10px] font-bold bg-white border border-slate-200 px-1.5 py-0.5 rounded text-sub mr-2"
+                          >기술 트렌드</span
+                        >
+                        <h4 class="text-sm font-bold text-slate-800 truncate">
+                          생성형 AI, 제조업 공정 효율 30% 개선 사례
+                        </h4>
+                      </div>
+                      <p
+                        class="text-xs text-slate-600 leading-relaxed line-clamp-2"
+                      >
+                        스마트 팩토리 도입 기업들의 데이터 분석 시간이
+                        획기적으로 단축되었습니다. 도입 검토가 시급합니다.
+                      </p>
+                    </div>
+                    <div
+                      class="p-3 bg-slate-50 rounded-lg border border-slate-100 hover:bg-slate-100 transition-colors"
+                    >
+                      <div class="flex items-center mb-1">
+                        <span
+                          class="text-[10px] font-bold bg-white border border-slate-200 px-1.5 py-0.5 rounded text-sub mr-2"
+                          >규제/정책</span
+                        >
+                        <h4 class="text-sm font-bold text-slate-800 truncate">
+                          ESG 공시 의무화, 공급망 관리 비상
+                        </h4>
+                      </div>
+                      <p
+                        class="text-xs text-slate-600 leading-relaxed line-clamp-2"
+                      >
+                        협력사 탄소 배출량 데이터 확보가 필수 과제로
+                        떠올랐습니다. 구매팀과 연계한 대응 전략이 필요합니다.
+                      </p>
+                    </div>
+                  </div>
+
+                  <!-- Keywords & Chart Placeholder -->
+                  <div class="flex flex-col">
+                    <div class="mb-4">
+                      <h4
+                        class="text-xs font-bold text-sub mb-2 flex items-center"
+                      >
+                        <i
+                          data-lucide="trending-up"
+                          width="14"
+                          class="mr-1"
+                        ></i>
+                        실시간 트렌드 키워드
+                      </h4>
+                      <div class="flex flex-wrap gap-2">
+                        <span
+                          class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer"
+                          >#전고체배터리</span
+                        >
+                        <span
+                          class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer"
+                          >#DX가속화</span
+                        >
+                        <span
+                          class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer"
+                          >#탄소국경세</span
+                        >
+                        <span
+                          class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer"
+                          >#애자일조직</span
+                        >
+                        <span
+                          class="px-3 py-1 bg-main/5 text-main text-xs rounded-full font-medium hover:bg-main/10 cursor-pointer"
+                          >#생성형AI</span
+                        >
+                      </div>
+                    </div>
+                    <div
+                      class="flex-1 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-center p-4"
+                    >
+                      <div class="text-center">
+                        <i
+                          data-lucide="bar-chart-3"
+                          width="24"
+                          class="mx-auto text-slate-300 mb-2"
+                        ></i>
+                        <p class="text-xs text-slate-400">
+                          키워드 언급량 분석 차트<br />(데이터 수집 중...)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Document Summarizer -->
+              <div class="lg:col-span-2 space-y-6">
+                <div
+                  class="bg-white rounded-xl shadow-sm border border-slate-100 p-6"
+                >
+                  <h3
+                    class="font-semibold text-slate-700 mb-4 flex items-center justify-between"
+                  >
+                    <div class="flex items-center">
+                      <i
+                        data-lucide="file-text"
+                        width="18"
+                        class="mr-2 text-indigo-500"
+                      ></i>
+                      문서/메일 AI 요약
+                    </div>
+                    <span
+                      class="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded"
+                      >2건 처리 완료</span
+                    >
+                  </h3>
+                  <div class="space-y-4">
+                    <div class="border border-slate-200 rounded-lg p-4">
+                      <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center space-x-2">
+                          <span class="font-bold text-slate-800"
+                            >Q3 시장 동향 분석 보고서</span
+                          >
+                          <span class="text-xs text-sub">(24 pages)</span>
+                        </div>
+                        <button class="text-xs text-sub underline">
+                          원본 보기
+                        </button>
+                      </div>
+                      <div
+                        class="bg-slate-50 p-3 rounded text-sm text-slate-700 leading-relaxed"
+                      >
+                        <span
+                          class="inline-block bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded mr-2 align-middle"
+                          >AI 요약</span
+                        >
+                        경쟁사 A의 점유율이 5% 상승함에 따라 모바일 타겟 마케팅
+                        강화 필요. R&D 예산 10% 증액 제안.
+                      </div>
+                    </div>
+                    <div class="border border-slate-200 rounded-lg p-4">
+                      <div class="flex justify-between items-start mb-2">
+                        <div class="flex items-center space-x-2">
+                          <span class="font-bold text-slate-800"
+                            >서버 장애 대응 메뉴얼</span
+                          >
+                          <span class="text-xs text-sub">(15 pages)</span>
+                        </div>
+                        <button class="text-xs text-sub underline">
+                          원본 보기
+                        </button>
+                      </div>
+                      <div
+                        class="bg-slate-50 p-3 rounded text-sm text-slate-700 leading-relaxed"
+                      >
+                        <span
+                          class="inline-block bg-indigo-500 text-white text-[10px] px-1.5 py-0.5 rounded mr-2 align-middle"
+                          >AI 요약</span
+                        >
+                        장애 발생 시 L1 대응팀 15분 내 소집, L2 에스컬레이션
+                        기준 구체화 필요.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div
+                class="bg-white rounded-xl shadow-sm border border-slate-100 p-6 h-fit"
+              >
+                <h3 class="font-semibold text-slate-700 mb-4 flex items-center">
+                  <i
+                    data-lucide="calendar"
+                    width="18"
+                    class="mr-2 text-orange-500"
+                  ></i>
+                  스마트 일정 관리
+                </h3>
+
+                <div class="mb-6">
+                  <div class="flex items-center justify-between mb-2">
+                    <span class="text-sm font-medium text-slate-600"
+                      >오늘의 일정 충돌 감지</span
+                    >
+                    <span
+                      class="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full font-bold"
+                      >1건</span
+                    >
+                  </div>
+                  <div
+                    class="p-3 border-l-4 border-red-400 bg-red-50 rounded-r-lg"
+                  >
+                    <p class="text-sm font-bold text-slate-800">
+                      14:00 팀 주간회의
+                    </p>
+                    <p class="text-sm text-sub">vs 경영진 긴급 보고</p>
+                    <div
+                      class="mt-3 bg-white p-2 rounded border border-red-100"
+                    >
+                      <p class="text-xs text-slate-500 mb-1">
+                        🤖 AI 조율안 추천
+                      </p>
+                      <p class="text-xs text-slate-800 font-medium">
+                        팀 주간회의를 내일 오전 10시로 변경하고, 메일로 사전
+                        공지 발송.
+                      </p>
+                      <button
+                        class="mt-2 w-full bg-red-500 text-white text-xs py-1.5 rounded hover:bg-red-600"
+                      >
+                        이대로 조율하기
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 5. Students (엑셀 입력/업로드) View -->
+          <div
+            id="view-students"
+            class="hidden fade-in h-full flex flex-col space-y-6"
+          >
+            <header>
+              <h2 class="text-2xl font-bold text-slate-800 mb-1">
+                학생 관리 · 엑셀 입력/업로드
+              </h2>
+              <p class="text-sub">
+                학생 정보를 엑셀로 업로드하거나, 복사-붙여넣기, 개별 입력으로
+                추가한 뒤, 다시 Excel/CSV로 다운로드할 수 있습니다.
+              </p>
+            </header>
+
+            <div class="student-layout">
+              <!-- 왼쪽: 입력/업로드 영역 -->
+              <div class="card form-card">
+                <h1>학생 정보 입력 연습 (엑셀 업로드/붙여넣기)</h1>
+                <p class="subtitle">
+                  ✅ <strong>엑셀 파일 업로드</strong> 또는
+                  <strong>엑셀에서 복사→붙여넣기</strong> 후 오른쪽 리스트에
+                  자동 추가됩니다.<br />
+                  🔹 엑셀 양식은 <code>학생 이름 (필수)</code>,
+                  <code>부모님 전화번호 (필수).</code> … 원본 헤더를 그대로 써도
+                  되고,<br />
+                  🔹 간단히
+                  <code
+                    >이름 / 부모 / 학생폰 / 학교 / 학년 / 계열 / 성별 /
+                    비번</code
+                  >
+                  같은 한국어 헤더를 써도 인식합니다.
+                </p>
+
+                <h2>엑셀 파일 업로드</h2>
+                <div class="form-actions" style="margin-top: 4px">
+                  <input
+                    type="file"
+                    id="excel-file-input"
+                    accept=".xlsx,.xls,.csv"
+                  />
+                  <span class="status-text"
+                    >[대치온] 학생 추가용 시트.xlsx 그대로 올려도
+                    인식됩니다.</span
+                  >
+                </div>
+
+                <h2>엑셀 일괄 입력 (복사 붙여넣기)</h2>
+                <textarea
+                  id="excel-bulk-input-area"
+                  placeholder="예시:
+김학생	010-1111-1111	010-2222-2222	서강고	고1	이과	남	abcd
+이학생	010-3333-3333	010-4444-4444	광성고	고2	문과	여	qwer
+"
+                ></textarea>
+                <div class="form-actions" style="margin-top: 8px">
+                  <button id="add-bulk-button" class="secondary-btn">
+                    ⬇️ 붙여넣은 내용 전체 추가
+                  </button>
+                </div>
+
+                <h2>개별 입력</h2>
+                <div class="form-grid">
+                  <div class="form-field">
+                    <label for="student-name-input">이름 (필수)</label>
+                    <input
+                      type="text"
+                      id="student-name-input"
+                      placeholder="예: 김학생"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label for="parent-phone-input">부모님 전화 (필수)</label>
+                    <input
+                      type="tel"
+                      id="parent-phone-input"
+                      placeholder="010-0000-0000"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label for="student-phone-input">학생 전화</label>
+                    <input
+                      type="tel"
+                      id="student-phone-input"
+                      placeholder="010-0000-0000"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label for="password-input">비밀번호 (필수)</label>
+                    <input
+                      type="password"
+                      id="password-input"
+                      placeholder="예: abcd"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label for="highschool-name-input">학교</label>
+                    <input
+                      type="text"
+                      id="highschool-name-input"
+                      placeholder="예: 서강고"
+                    />
+                  </div>
+                  <div class="form-field">
+                    <label for="grade-select">학년</label>
+                    <select id="grade-select">
+                      <option value="">선택 안 함</option>
+                      <option value="중1">중1</option>
+                      <option value="중2">중2</option>
+                      <option value="중3">중3</option>
+                      <option value="고1">고1</option>
+                      <option value="고2">고2</option>
+                      <option value="고3">고3</option>
+                    </select>
+                  </div>
+                  <div class="form-field">
+                    <label for="track-select">계열</label>
+                    <select id="track-select">
+                      <option value="">선택 안 함</option>
+                      <option value="이과">이과</option>
+                      <option value="문과">문과</option>
+                      <option value="통합">통합</option>
+                    </select>
+                  </div>
+                  <div class="form-field">
+                    <label for="gender-select">성별</label>
+                    <select id="gender-select">
+                      <option value="">선택 안 함</option>
+                      <option value="남">남</option>
+                      <option value="여">여</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button id="add-student-button">➕ 리스트에 추가</button>
+                  <button
+                    type="button"
+                    class="secondary-btn"
+                    id="clear-fields-button"
+                  >
+                    🧹 입력값 초기화
+                  </button>
+                  <span class="status-text" id="status-text"
+                    >아직 추가된 학생이 없습니다.</span
+                  >
+                </div>
+              </div>
+
+              <!-- 오른쪽: 학생 리스트 / 다운로드 -->
+              <div class="card student-list-panel">
+                <div class="student-list-header">
+                  <span class="student-list-title">학생 리스트</span>
+                  <span class="student-count-badge" id="student-count-badge"
+                    >0명</span
+                  >
+                  <span style="display: flex; gap: 5px">
+                    <button
+                      id="download-xlsx-btn"
+                      class="secondary-btn"
+                      style="padding: 5px 10px"
+                    >
+                      📥 Excel
+                    </button>
+                    <button
+                      id="download-csv-btn"
+                      class="secondary-btn"
+                      style="padding: 5px 10px"
+                    >
+                      📥 CSV
+                    </button>
+                  </span>
+                </div>
+                <div class="student-table-container">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>이름</th>
+                        <th>부모</th>
+                        <th>학생폰</th>
+                        <th>학교/학년</th>
+                        <th>계열</th>
+                        <th>성별</th>
+                        <th>비번</th>
+                      </tr>
+                    </thead>
+                    <tbody id="student-list-body">
+                      <!-- JS로 행이 추가됨 -->
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
 
     <!-- JavaScript Logic -->
     <script>
-        // --- Data ---
-        const teamMembers = [
-            { 
-                id: 1, name: '박재현', role: '우리조 분위기 메이커', effort: 92, result: 85, difficulty: '상', recent: '팀 활력 증진 이벤트 기획',
-                detailedTasks: [
-                    { date: '10/20', task: '팀 할로윈 파티 기획안 제출', status: '완료' },
-                    { date: '10/22', task: '워크샵 장소 사전 답사', status: '진행중' },
-                    { date: '10/24', task: '분기별 팀원 인터뷰 정리', status: '대기' }
-                ]
+      // --- Data ---
+      const teamMembers = [
+        {
+          id: 1,
+          name: "박재현",
+          role: "우리조 분위기 메이커",
+          effort: 92,
+          result: 85,
+          difficulty: "상",
+          recent: "팀 활력 증진 이벤트 기획",
+          detailedTasks: [
+            {
+              date: "10/20",
+              task: "팀 할로윈 파티 기획안 제출",
+              status: "완료",
             },
-            { 
-                id: 2, name: '박태희', role: '멋진 팀장님', effort: 98, result: 99, difficulty: '최상', recent: '전사 비전 수립 및 전파',
-                detailedTasks: [
-                    { date: '10/18', task: '2024 전사 비전 발표 PT 준비', status: '완료' },
-                    { date: '10/23', task: '부서장 회의 안건 발의', status: '완료' },
-                    { date: '10/25', task: '팀 리소스 배분 계획 수정', status: '진행중' }
-                ]
+            { date: "10/22", task: "워크샵 장소 사전 답사", status: "진행중" },
+            { date: "10/24", task: "분기별 팀원 인터뷰 정리", status: "대기" },
+          ],
+        },
+        {
+          id: 2,
+          name: "박태희",
+          role: "멋진 팀장님",
+          effort: 98,
+          result: 99,
+          difficulty: "최상",
+          recent: "전사 비전 수립 및 전파",
+          detailedTasks: [
+            {
+              date: "10/18",
+              task: "2024 전사 비전 발표 PT 준비",
+              status: "완료",
             },
-            { 
-                id: 3, name: '박정호', role: '우리조 샤크', effort: 88, result: 80, difficulty: '상', recent: '공격적 시장 진입 전략 수립',
-                detailedTasks: [
-                    { date: '10/21', task: '경쟁사 C사 가격 정책 분석', status: '완료' },
-                    { date: '10/22', task: '신규 마켓 진입 시나리오 기획', status: '진행중' },
-                    { date: '10/24', task: '영업팀 전략 공유 미팅', status: '예정' }
-                ]
+            { date: "10/23", task: "부서장 회의 안건 발의", status: "완료" },
+            {
+              date: "10/25",
+              task: "팀 리소스 배분 계획 수정",
+              status: "진행중",
             },
-            { 
-                id: 4, name: '하유림', role: '슈퍼 크랙', effort: 95, result: 96, difficulty: '상', recent: '핵심 난제 해결 및 성과 견인',
-                detailedTasks: [
-                    { date: '10/19', task: '레거시 시스템 데이터 마이그레이션', status: '완료' },
-                    { date: '10/21', task: '결제 모듈 성능 이슈 핫픽스', status: '완료' },
-                    { date: '10/23', task: '신규 API 문서화 작업', status: '진행중' }
-                ]
+          ],
+        },
+        {
+          id: 3,
+          name: "박정호",
+          role: "우리조 샤크",
+          effort: 88,
+          result: 80,
+          difficulty: "상",
+          recent: "공격적 시장 진입 전략 수립",
+          detailedTasks: [
+            {
+              date: "10/21",
+              task: "경쟁사 C사 가격 정책 분석",
+              status: "완료",
             },
-        ];
+            {
+              date: "10/22",
+              task: "신규 마켓 진입 시나리오 기획",
+              status: "진행중",
+            },
+            { date: "10/24", task: "영업팀 전략 공유 미팅", status: "예정" },
+          ],
+        },
+        {
+          id: 4,
+          name: "하유림",
+          role: "슈퍼 크랙",
+          effort: 95,
+          result: 96,
+          difficulty: "상",
+          recent: "핵심 난제 해결 및 성과 견인",
+          detailedTasks: [
+            {
+              date: "10/19",
+              task: "레거시 시스템 데이터 마이그레이션",
+              status: "완료",
+            },
+            {
+              date: "10/21",
+              task: "결제 모듈 성능 이슈 핫픽스",
+              status: "완료",
+            },
+            { date: "10/23", task: "신규 API 문서화 작업", status: "진행중" },
+          ],
+        },
+      ];
 
-        const careTips = [
-            { icon: 'coffee', color: 'text-amber-600', bg: 'bg-amber-50', title: '따뜻한 차 한 잔의 여유', content: '계속되는 회의로 목이 타시죠? ☕️ 지금 잠깐 5분만 시간을 내어 따뜻한 캐모마일 티를 마셔보세요. 긴장 완화에 도움이 됩니다.' },
-            { icon: 'sun', color: 'text-orange-500', bg: 'bg-orange-50', title: '광합성 타임', content: '실내에만 계신가요? ☀️ 창문을 열거나 잠시 옥상에 올라가 햇볕을 쬐어보세요. 비타민D는 리더의 우울감을 없애주는 특효약입니다!' },
-            { icon: 'music', color: 'text-purple-500', bg: 'bg-purple-50', title: '화이트 노이즈 & 명상', content: '머리가 복잡할 땐 눈을 감고 3분만 심호흡 해보세요. 🎧 빗소리나 파도 소리를 들으며 뇌를 잠시 "오프(Off)" 시키는 것도 전략입니다.' },
-            { icon: 'smile', color: 'text-pink-500', bg: 'bg-pink-50', title: '거울 보고 스마일', content: '리더의 표정은 팀의 날씨입니다. 😊 거울을 보고 억지로라도 한번 웃어보세요. 뇌가 즐거운 일이 있다고 착각해 엔돌핀을 선물할 거예요.' },
-        ];
+      const careTips = [
+        {
+          icon: "coffee",
+          color: "text-amber-600",
+          bg: "bg-amber-50",
+          title: "따뜻한 차 한 잔의 여유",
+          content:
+            "계속되는 회의로 목이 타시죠? ☕️ 지금 잠깐 5분만 시간을 내어 따뜻한 캐모마일 티를 마셔보세요. 긴장 완화에 도움이 됩니다.",
+        },
+        {
+          icon: "sun",
+          color: "text-orange-500",
+          bg: "bg-orange-50",
+          title: "광합성 타임",
+          content:
+            "실내에만 계신가요? ☀️ 창문을 열거나 잠시 옥상에 올라가 햇볕을 쬐어보세요. 비타민D는 리더의 우울감을 없애주는 특효약입니다!",
+        },
+        {
+          icon: "music",
+          color: "text-purple-500",
+          bg: "bg-purple-50",
+          title: "화이트 노이즈 & 명상",
+          content:
+            '머리가 복잡할 땐 눈을 감고 3분만 심호흡 해보세요. 🎧 빗소리나 파도 소리를 들으며 뇌를 잠시 "오프(Off)" 시키는 것도 전략입니다.',
+        },
+        {
+          icon: "smile",
+          color: "text-pink-500",
+          bg: "bg-pink-50",
+          title: "거울 보고 스마일",
+          content:
+            "리더의 표정은 팀의 날씨입니다. 😊 거울을 보고 억지로라도 한번 웃어보세요. 뇌가 즐거운 일이 있다고 착각해 엔돌핀을 선물할 거예요.",
+        },
+      ];
 
-        let selectedMemberId = 1;
-        let currentFeedbackTarget = '하유림';
+      let selectedMemberId = 1;
+      let currentFeedbackTarget = "하유림";
 
-        // --- Functions ---
+      // --- Functions ---
 
-        function getPuppySVG(emotion = 'happy', size = 40) {
-            // Removed SVG logic, replaced with simple Emoji
-            const fontSize = Math.max(20, size * 0.8); 
-            let emoji = '🐶';
-            
-            if (emotion === 'sleepy') {
-               emoji = '🐶'; 
+      function getPuppySVG(emotion = "happy", size = 40) {
+        const fontSize = Math.max(20, size * 0.8);
+        let emoji = "🐶";
+        if (emotion === "sleepy") {
+          emoji = "🐶";
+        }
+        return `<div style="font-size: ${fontSize}px; line-height: 1; display: flex; justify-content: center; align-items: center; cursor: default;">${emoji}</div>`;
+      }
+
+      function switchTab(tabName) {
+        ["dashboard", "fairness", "relationship", "time", "students"].forEach(
+          (t) => {
+            const view = document.getElementById(`view-${t}`);
+            if (view) {
+              view.classList.add("hidden");
             }
-            
-            return `<div style="font-size: ${fontSize}px; line-height: 1; display: flex; justify-content: center; align-items: center; cursor: default;">${emoji}</div>`;
+          }
+        );
+        const currentView = document.getElementById(`view-${tabName}`);
+        if (currentView) {
+          currentView.classList.remove("hidden");
         }
 
-        function switchTab(tabName) {
-            ['dashboard', 'fairness', 'relationship', 'time'].forEach(t => {
-                document.getElementById(`view-${t}`).classList.add('hidden');
-            });
-            document.getElementById(`view-${tabName}`).classList.remove('hidden');
-            
-            const buttons = document.querySelectorAll('.sidebar-item');
-            buttons.forEach(btn => {
-                if(btn.textContent.trim().includes(translateTab(tabName))) {
-                    btn.classList.add('active', 'text-main');
-                    btn.classList.remove('text-white/80');
-                } else {
-                    btn.classList.remove('active', 'text-main');
-                    btn.classList.add('text-white/80');
-                }
-            });
-            lucide.createIcons();
-        }
+        const buttons = document.querySelectorAll(".sidebar-item");
+        buttons.forEach((btn) => {
+          if (btn.textContent.trim().includes(translateTab(tabName))) {
+            btn.classList.add("active", "text-main");
+            btn.classList.remove("text-white/80");
+          } else {
+            btn.classList.remove("active", "text-main");
+            btn.classList.add("text-white/80");
+          }
+        });
+        lucide.createIcons();
+      }
 
-        function translateTab(eng) {
-            const map = { 'dashboard': '대시보드', 'fairness': '공정성', 'relationship': '관계', 'time': '시간' };
-            return map[eng];
-        }
+      function translateTab(eng) {
+        const map = {
+          dashboard: "대시보드",
+          fairness: "공정성",
+          relationship: "관계",
+          time: "시간",
+          students: "학생 관리",
+        };
+        return map[eng] || "";
+      }
 
-        function renderFairness() {
-            const listContainer = document.getElementById('team-list-container');
-            listContainer.innerHTML = teamMembers.map(m => `
-                <button onclick="selectMember(${m.id})" class="w-full flex items-center justify-between p-3 rounded-lg transition-all ${m.id === selectedMemberId ? 'bg-main/5 border border-main/20 ring-1 ring-main/20' : 'hover:bg-slate-50 border border-transparent'}">
+      function renderFairness() {
+        const listContainer = document.getElementById("team-list-container");
+        listContainer.innerHTML = teamMembers
+          .map(
+            (m) => `
+                <button onclick="selectMember(${
+                  m.id
+                })" class="w-full flex items-center justify-between p-3 rounded-lg transition-all ${
+              m.id === selectedMemberId
+                ? "bg-main/5 border border-main/20 ring-1 ring-main/20"
+                : "hover:bg-slate-50 border border-transparent"
+            }">
                     <div class="flex items-center space-x-3">
                         <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 font-bold">
                             ${m.name[0]}
                         </div>
                         <div class="text-left">
-                            <div class="font-medium text-slate-800">${m.name}</div>
+                            <div class="font-medium text-slate-800">${
+                              m.name
+                            }</div>
                             <div class="text-xs text-sub">${m.role}</div>
                         </div>
                     </div>
                     <i data-lucide="chevron-right" width="16" class="text-sub"></i>
                 </button>
-            `).join('');
+            `
+          )
+          .join("");
 
-            const member = teamMembers.find(m => m.id === selectedMemberId);
-            const detailContainer = document.getElementById('fairness-detail');
-            
-            const insight = member.effort > member.result 
-                ? `${member.name}님은 높은 노력(Process)을 기울였으나, 외부 요인으로 인해 결과(Result) 지표가 다소 낮습니다. 평가 면담 시 이 부분을 충분히 참작했다는 점을 언급하여 억울함을 해소해 주세요. 멍!`
-                : `${member.name}님은 효율적으로 성과를 냈습니다. 다만 팀 내 기여도 측면에서 동료들과의 협업 빈도를 높이도록 코칭하면 더 좋은 리더로 성장할 수 있습니다. 멍!`;
+        const member = teamMembers.find((m) => m.id === selectedMemberId);
+        const detailContainer = document.getElementById("fairness-detail");
 
-            const detailedTasksHtml = member.detailedTasks.map(task => `
+        const insight =
+          member.effort > member.result
+            ? `${member.name}님은 높은 노력(Process)을 기울였으나, 외부 요인으로 인해 결과(Result) 지표가 다소 낮습니다. 평가 면담 시 이 부분을 충분히 참작했다는 점을 언급하여 억울함을 해소해 주세요. 멍!`
+            : `${member.name}님은 효율적으로 성과를 냈습니다. 다만 팀 내 기여도 측면에서 동료들과의 협업 빈도를 높이도록 코칭하면 더 좋은 리더로 성장할 수 있습니다. 멍!`;
+
+        const detailedTasksHtml = member.detailedTasks
+          .map(
+            (task) => `
                 <div class="flex items-center justify-between p-3 bg-white border border-slate-100 rounded-lg mb-2">
                     <div class="flex items-center space-x-3">
-                        <span class="text-xs font-mono text-sub bg-slate-100 px-2 py-1 rounded">${task.date}</span>
+                        <span class="text-xs font-mono text-sub bg-slate-100 px-2 py-1 rounded">${
+                          task.date
+                        }</span>
                         <span class="text-sm text-slate-700">${task.task}</span>
                     </div>
-                    <span class="text-xs font-bold ${task.status === '완료' ? 'text-green-600' : (task.status === '진행중' ? 'text-blue-600' : 'text-slate-400')}">
+                    <span class="text-xs font-bold ${
+                      task.status === "완료"
+                        ? "text-green-600"
+                        : task.status === "진행중"
+                        ? "text-blue-600"
+                        : "text-slate-400"
+                    }">
                         ${task.status}
                     </span>
                 </div>
-            `).join('');
+            `
+          )
+          .join("");
 
-            detailContainer.innerHTML = `
+        detailContainer.innerHTML = `
                 <div class="flex justify-between items-start mb-6">
                     <div>
-                        <h3 class="text-xl font-bold text-slate-800">${member.name} <span class="text-base font-normal text-sub">님의 성과 분석</span></h3>
-                        <span class="inline-block mt-1 px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">최근 업무: ${member.recent}</span>
+                        <h3 class="text-xl font-bold text-slate-800">${
+                          member.name
+                        } <span class="text-base font-normal text-sub">님의 성과 분석</span></h3>
+                        <span class="inline-block mt-1 px-2 py-0.5 bg-indigo-100 text-indigo-700 text-xs rounded-full font-medium">최근 업무: ${
+                          member.recent
+                        }</span>
                     </div>
                     <div class="text-right">
                         <div class="text-sm text-sub">AI 난이도 보정</div>
-                        <div class="text-lg font-bold text-main">${member.difficulty} (High)</div>
+                        <div class="text-lg font-bold text-main">${
+                          member.difficulty
+                        } (High)</div>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-6 mb-6">
                     <div class="bg-slate-50 p-4 rounded-lg">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-medium text-slate-600">기여도 (Effort)</span>
-                            <span class="text-lg font-bold text-slate-800">${member.effort}점</span>
+                            <span class="text-lg font-bold text-slate-800">${
+                              member.effort
+                            }점</span>
                         </div>
                         <div class="w-full bg-slate-200 rounded-full h-2.5">
-                            <div class="bg-main h-2.5 rounded-full" style="width: ${member.effort}%"></div>
+                            <div class="bg-main h-2.5 rounded-full" style="width: ${
+                              member.effort
+                            }%"></div>
                         </div>
                     </div>
                     <div class="bg-slate-50 p-4 rounded-lg">
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-medium text-slate-600">결과 (Result)</span>
-                            <span class="text-lg font-bold text-slate-800">${member.result}점</span>
+                            <span class="text-lg font-bold text-slate-800">${
+                              member.result
+                            }점</span>
                         </div>
                         <div class="w-full bg-slate-200 rounded-full h-2.5">
-                            <div class="bg-green-500 h-2.5 rounded-full" style="width: ${member.result}%"></div>
+                            <div class="bg-green-500 h-2.5 rounded-full" style="width: ${
+                              member.result
+                            }%"></div>
                         </div>
                     </div>
                 </div>
@@ -645,7 +1542,7 @@
                 </div>
                 <div class="bg-main/5 rounded-lg p-5 border border-main/20 mt-auto">
                     <div class="flex items-start space-x-3">
-                        <div class="mt-1">${getPuppySVG('smart', 32)}</div>
+                        <div class="mt-1">${getPuppySVG("smart", 32)}</div>
                         <div>
                             <h4 class="font-bold text-main mb-1">케밀리의 코칭 노트 🐶</h4>
                             <p class="text-sm text-main leading-relaxed">${insight}</p>
@@ -653,103 +1550,146 @@
                     </div>
                 </div>
             `;
-            lucide.createIcons();
+        lucide.createIcons();
+      }
+
+      function selectMember(id) {
+        selectedMemberId = id;
+        renderFairness();
+      }
+
+      function generateMessage(tone) {
+        const area = document.getElementById("message-area");
+        const input = document.getElementById("message-input");
+
+        if (input) {
+          input.value = "";
         }
 
-        function selectMember(id) {
-            selectedMemberId = id;
-            renderFairness();
-        }
-
-        function generateMessage(tone) {
-            const area = document.getElementById('message-area');
-            const input = document.getElementById('message-input');
-            
-            // Fix: Check if input exists before accessing value
-            if (input) {
-                input.value = '';
-            }
-
-            area.innerHTML = `
+        area.innerHTML = `
                 <div class="absolute inset-0 flex items-center justify-center flex-col">
                     <div class="w-6 h-6 border-2 border-main border-t-transparent rounded-full animate-spin mb-2"></div>
                     <span class="text-xs text-main">케밀리가 고민중입니다... 🐶</span>
                 </div>
             `;
 
-            setTimeout(() => {
-                let text = "";
-                const target = currentFeedbackTarget;
+        setTimeout(() => {
+          let text = "";
+          const target = currentFeedbackTarget;
 
-                if (target === '하유림') {
-                    if (tone === 'formal') text = "유림님, 항상 깊이 있는 리서치와 탁월한 결과물을 공유해 주셔서 감사합니다. 유림님의 훌륭한 리서치 퀄리티 덕분에 팀 전체가 새로운 인사이트를 얻고 있습니다. 앞으로도 좋은 활약 기대합니다.";
-                    else if (tone === 'friendly') text = "유림님! 이번에 공유해주신 리서치 자료 진짜 대박이에요 👍 보면서 계속 감탄했어요. 저도 유림님 덕분에 많이 배우고 갑니다! 항상 고마워요 ☕️";
-                    else text = "유림님, 매번 기대 이상의 리서치 퀄리티를 보여주시는 열정에 박수를 보냅니다! 유림님의 전문성이 우리 팀의 경쟁력을 높이고 있습니다. 최고예요!";
-                } else if (target === '박재현') {
-                    if (tone === 'formal') text = "재현님, 언제나 회의 분위기를 긍정적으로 이끌어 주셔서 감사합니다. 재현님 덕분에 팀 내 소통이 원활해지고, 업무 효율도 높아지고 있습니다.";
-                    else if (tone === 'friendly') text = "재현님 ㅋㅋ 명실상부 우리 조 분위기 메이커 인정! 😆 회의 때마다 재현님 덕분에 빵 터져서 행복하게 일하고 있어요. 우리 팀의 비타민 같은 존재!";
-                    else text = "재현님, 지칠 수 있는 상황에서도 웃음을 잃지 않고 팀에 활력을 불어넣어 주셔서 정말 든든합니다. 재현님의 밝은 에너지가 우리 팀의 가장 큰 무기입니다!";
-                } else if (target === '박태희') {
-                    if (tone === 'formal') text = "태희 팀장님, 탁월한 리더십으로 팀을 성공적으로 이끌어 주셔서 깊이 감사드립니다. 팀장님의 방향성 덕분에 모두가 업무에 확신을 갖고 임할 수 있습니다.";
-                    else if (tone === 'friendly') text = "태희님! 항상 멋지게 리딩해주셔서 너무 감사해요. 태희님 덕분에 요즘 팀 분위기도 좋고 일하는 게 너무 재밌어요! 믿고 따르겠습니다 👍";
-                    else text = "태희님, 팀원들을 아우르는 리더십과 헌신적인 모습에 항상 감동하고 있습니다. 태희님과 함께라면 어떤 목표든 달성할 수 있을 것 같아요! 화이팅!";
-                } else if (target === '박정호') {
-                    if (tone === 'formal') text = "정호님, 업무에서 보여주시는 분석력과 통찰력에 매번 놀라고 있습니다. 정호님의 날카로운 인사이트가 프로젝트의 완성도를 높이는 데 큰 역할을 합니다.";
-                    else if (tone === 'friendly') text = "정호님, 이번 분석 진짜 소름... 😲 어떻게 그런 부분까지 캐치하셨어요? 정호님의 엄청난 인사이트, 제가 많이 배우고 있습니다! 리스펙!";
-                    else text = "정호님, 복잡한 문제의 핵심을 꿰뚫어 보는 통찰력은 우리 팀의 대체 불가한 자산입니다. 정호님의 능력을 마음껏 펼쳐주세요. 항상 응원합니다!";
-                } else {
-                    text = `${target}님, 항상 팀을 위해 노력해주셔서 감사합니다.`;
-                }
-                
-                // Fix: Add id="message-input" to the newly generated textarea
-                area.innerHTML = `<textarea class="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed outline-none" id="message-input">${text}</textarea>`;
-            }, 800);
-        }
+          if (target === "하유림") {
+            if (tone === "formal")
+              text =
+                "유림님, 항상 깊이 있는 리서치와 탁월한 결과물을 공유해 주셔서 감사합니다. 유림님의 훌륭한 리서치 퀄리티 덕분에 팀 전체가 새로운 인사이트를 얻고 있습니다. 앞으로도 좋은 활약 기대합니다.";
+            else if (tone === "friendly")
+              text =
+                "유림님! 이번에 공유해주신 리서치 자료 진짜 대박이에요 👍 보면서 계속 감탄했어요. 저도 유림님 덕분에 많이 배우고 갑니다! 항상 고마워요 ☕️";
+            else
+              text =
+                "유림님, 매번 기대 이상의 리서치 퀄리티를 보여주시는 열정에 박수를 보냅니다! 유림님의 전문성이 우리 팀의 경쟁력을 높이고 있습니다. 최고예요!";
+          } else if (target === "박재현") {
+            if (tone === "formal")
+              text =
+                "재현님, 언제나 회의 분위기를 긍정적으로 이끌어 주셔서 감사합니다. 재현님 덕분에 팀 내 소통이 원활해지고, 업무 효율도 높아지고 있습니다.";
+            else if (tone === "friendly")
+              text =
+                "재현님 ㅋㅋ 명실상부 우리 조 분위기 메이커 인정! 😆 회의 때마다 재현님 덕분에 빵 터져서 행복하게 일하고 있어요. 우리 팀의 비타민 같은 존재!";
+            else
+              text =
+                "재현님, 지칠 수 있는 상황에서도 웃음을 잃지 않고 팀에 활력을 불어넣어 주셔서 정말 든든합니다. 재현님의 밝은 에너지가 우리 팀의 가장 큰 무기입니다!";
+          } else if (target === "박태희") {
+            if (tone === "formal")
+              text =
+                "태희 팀장님, 탁월한 리더십으로 팀을 성공적으로 이끌어 주셔서 깊이 감사드립니다. 팀장님의 방향성 덕분에 모두가 업무에 확신을 갖고 임할 수 있습니다.";
+            else if (tone === "friendly")
+              text =
+                "태희님! 항상 멋지게 리딩해주셔서 너무 감사해요. 태희님 덕분에 요즘 팀 분위기도 좋고 일하는 게 너무 재밌어요! 믿고 따르겠습니다 👍";
+            else
+              text =
+                "태희님, 팀원들을 아우르는 리더십과 헌신적인 모습에 항상 감동하고 있습니다. 태희님과 함께라면 어떤 목표든 달성할 수 있을 것 같아요! 화이팅!";
+          } else if (target === "박정호") {
+            if (tone === "formal")
+              text =
+                "정호님, 업무에서 보여주시는 분석력과 통찰력에 매번 놀라고 있습니다. 정호님의 날카로운 인사이트가 프로젝트의 완성도를 높이는 데 큰 역할을 합니다.";
+            else if (tone === "friendly")
+              text =
+                "정호님, 이번 분석 진짜 소름... 😲 어떻게 그런 부분까지 캐치하셨어요? 정호님의 엄청난 인사이트, 제가 많이 배우고 있습니다! 리스펙!";
+            else
+              text =
+                "정호님, 복잡한 문제의 핵심을 꿰뚫어 보는 통찰력은 우리 팀의 대체 불가한 자산입니다. 정호님의 능력을 마음껏 펼쳐주세요. 항상 응원합니다!";
+          } else {
+            text = `${target}님, 항상 팀을 위해 노력해주셔서 감사합니다.`;
+          }
 
-        function setFeedbackTarget(name) {
-            currentFeedbackTarget = name;
-            document.getElementById('generator-title').innerText = `AI 메시지 생성기 (${name}님)`;
-            
-            const cards = ['alert-hayurim', 'alert-parkjaehyun', 'alert-parktaehee', 'alert-parkjeongho'];
-            cards.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    // Reset classes
-                    el.classList.remove('ring-2', 'ring-pink-200', 'bg-pink-50', 'ring-slate-300', 'bg-slate-50', 'bg-blue-50', 'ring-blue-200', 'bg-indigo-50', 'ring-indigo-200');
-                    el.classList.add('bg-white', 'border-slate-200');
+          area.innerHTML = `<textarea class="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed outline-none" id="message-input">${text}</textarea>`;
+        }, 800);
+      }
 
-                    if (id.includes('hayurim') && name === '하유림') {
-                        el.classList.add('ring-2', 'ring-pink-200', 'bg-pink-50');
-                        el.classList.remove('bg-white', 'border-slate-200');
-                    } else if (id.includes('parkjaehyun') && name === '박재현') {
-                        el.classList.add('ring-2', 'ring-slate-300', 'bg-slate-50');
-                        el.classList.remove('bg-white', 'border-slate-200');
-                    } else if (id.includes('parktaehee') && name === '박태희') {
-                        el.classList.add('ring-2', 'ring-blue-200', 'bg-blue-50');
-                        el.classList.remove('bg-white', 'border-slate-200');
-                    } else if (id.includes('parkjeongho') && name === '박정호') {
-                        el.classList.add('ring-2', 'ring-indigo-200', 'bg-indigo-50');
-                        el.classList.remove('bg-white', 'border-slate-200');
-                    }
-                }
-            });
-            
-            // Fix: Add id="message-input" to the reset textarea
-            document.getElementById('message-area').innerHTML = `<textarea class="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed outline-none" id="message-input">위 버튼을 눌러 AI에게 ${name}님을 위한 초안 작성을 요청하세요.</textarea>`;
-        }
+      function setFeedbackTarget(name) {
+        currentFeedbackTarget = name;
+        document.getElementById(
+          "generator-title"
+        ).innerText = `AI 메시지 생성기 (${name}님)`;
 
-        function renderCareTip(index) {
-            const tip = careTips[index];
-            const container = document.getElementById('care-content-area');
-            
-            let iconHtml = '';
-            if(tip.icon === 'coffee') iconHtml = '<i data-lucide="coffee" width="24"></i>';
-            if(tip.icon === 'sun') iconHtml = '<i data-lucide="sun" width="24"></i>';
-            if(tip.icon === 'music') iconHtml = '<i data-lucide="music" width="24"></i>';
-            if(tip.icon === 'smile') iconHtml = '<i data-lucide="smile" width="24"></i>';
+        const cards = [
+          "alert-hayurim",
+          "alert-parkjaehyun",
+          "alert-parktaehee",
+          "alert-parkjeongho",
+        ];
+        cards.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) {
+            el.classList.remove(
+              "ring-2",
+              "ring-pink-200",
+              "bg-pink-50",
+              "ring-slate-300",
+              "bg-slate-50",
+              "bg-blue-50",
+              "ring-blue-200",
+              "bg-indigo-50",
+              "ring-indigo-200"
+            );
+            el.classList.add("bg-white", "border-slate-200");
 
-            container.className = `flex items-start p-4 rounded-xl ${tip.bg} transition-all duration-300`;
-            container.innerHTML = `
+            if (id.includes("hayurim") && name === "하유림") {
+              el.classList.add("ring-2", "ring-pink-200", "bg-pink-50");
+              el.classList.remove("bg-white", "border-slate-200");
+            } else if (id.includes("parkjaehyun") && name === "박재현") {
+              el.classList.add("ring-2", "ring-slate-300", "bg-slate-50");
+              el.classList.remove("bg-white", "border-slate-200");
+            } else if (id.includes("parktaehee") && name === "박태희") {
+              el.classList.add("ring-2", "ring-blue-200", "bg-blue-50");
+              el.classList.remove("bg-white", "border-slate-200");
+            } else if (id.includes("parkjeongho") && name === "박정호") {
+              el.classList.add("ring-2", "ring-indigo-200", "bg-indigo-50");
+              el.classList.remove("bg-white", "border-slate-200");
+            }
+          }
+        });
+
+        document.getElementById(
+          "message-area"
+        ).innerHTML = `<textarea class="w-full h-full bg-transparent border-none resize-none focus:ring-0 text-slate-700 leading-relaxed outline-none" id="message-input">위 버튼을 눌러 AI에게 ${name}님을 위한 초안 작성을 요청하세요.</textarea>`;
+      }
+
+      function renderCareTip(index) {
+        const tip = careTips[index];
+        const container = document.getElementById("care-content-area");
+
+        let iconHtml = "";
+        if (tip.icon === "coffee")
+          iconHtml = '<i data-lucide="coffee" width="24"></i>';
+        if (tip.icon === "sun")
+          iconHtml = '<i data-lucide="sun" width="24"></i>';
+        if (tip.icon === "music")
+          iconHtml = '<i data-lucide="music" width="24"></i>';
+        if (tip.icon === "smile")
+          iconHtml = '<i data-lucide="smile" width="24"></i>';
+
+        container.className = `flex items-start p-4 rounded-xl ${tip.bg} transition-all duration-300`;
+        container.innerHTML = `
                 <div class="p-3 rounded-full bg-white shadow-sm ${tip.color} mr-4">
                     ${iconHtml}
                 </div>
@@ -759,40 +1699,349 @@
                     <p class="text-xs text-sub mt-2">From. 리더의 건강까지 생각하는 케밀리 🐶</p>
                 </div>
             `;
-            lucide.createIcons();
-        }
+        lucide.createIcons();
+      }
 
-        function rotateTip() {
-            const btn = document.getElementById('refresh-icon');
-            btn.classList.add('animate-spin');
-            document.getElementById('care-section').classList.add('opacity-50');
-            
-            setTimeout(() => {
-                const randomIndex = Math.floor(Math.random() * careTips.length);
-                renderCareTip(randomIndex);
-                btn.classList.remove('animate-spin');
-                document.getElementById('care-section').classList.remove('opacity-50');
-            }, 500);
-        }
+      function rotateTip() {
+        const btn = document.getElementById("refresh-icon");
+        btn.classList.add("animate-spin");
+        document.getElementById("care-section").classList.add("opacity-50");
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('current-date').innerText = new Date().toLocaleDateString();
-            document.getElementById('mascot-small').innerHTML = getPuppySVG('happy', 35);
-            document.getElementById('mascot-dashboard').innerHTML = getPuppySVG('smart', 48);
-            document.getElementById('mascot-care').innerHTML = getPuppySVG('sleepy', 28);
-            
-            renderCareTip(0);
-            renderFairness();
-            lucide.createIcons();
+        setTimeout(() => {
+          const randomIndex = Math.floor(Math.random() * careTips.length);
+          renderCareTip(randomIndex);
+          btn.classList.remove("animate-spin");
+          document
+            .getElementById("care-section")
+            .classList.remove("opacity-50");
+        }, 500);
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("current-date").innerText =
+          new Date().toLocaleDateString();
+        document.getElementById("mascot-small").innerHTML = getPuppySVG(
+          "happy",
+          35
+        );
+        document.getElementById("mascot-dashboard").innerHTML = getPuppySVG(
+          "smart",
+          48
+        );
+        document.getElementById("mascot-care").innerHTML = getPuppySVG(
+          "sleepy",
+          28
+        );
+
+        renderCareTip(0);
+        renderFairness();
+        lucide.createIcons();
+      });
+
+      function toggleSidebar() {
+        const sidebar = document.getElementById("sidebar");
+        sidebar.classList.toggle("hidden");
+        sidebar.classList.toggle("absolute");
+        sidebar.classList.toggle("z-50");
+        sidebar.classList.toggle("h-full");
+      }
+
+      /* ===============================
+           학생 관리(엑셀) 기능 스크립트
+           원본 practice_for_excel_inputation 그대로 이식
+           =============================== */
+      const addButton = document.getElementById("add-student-button");
+      const addBulkButton = document.getElementById("add-bulk-button");
+      const clearButton = document.getElementById("clear-fields-button");
+      const statusText = document.getElementById("status-text");
+      const studentCountBadge = document.getElementById("student-count-badge");
+      const studentListBody = document.getElementById("student-list-body");
+      const excelBulkInputArea = document.getElementById(
+        "excel-bulk-input-area"
+      );
+      const excelFileInput = document.getElementById("excel-file-input");
+
+      const downloadXlsxBtn = document.getElementById("download-xlsx-btn");
+      const downloadCsvBtn = document.getElementById("download-csv-btn");
+
+      const fields = {
+        name: document.getElementById("student-name-input"),
+        parentPhone: document.getElementById("parent-phone-input"),
+        studentPhone: document.getElementById("student-phone-input"),
+        highschoolName: document.getElementById("highschool-name-input"),
+        grade: document.getElementById("grade-select"),
+        track: document.getElementById("track-select"),
+        gender: document.getElementById("gender-select"),
+        password: document.getElementById("password-input"),
+      };
+
+      function makeSchoolGrade(highschoolName, grade) {
+        if (highschoolName && grade) return highschoolName + " " + grade;
+        if (highschoolName) return highschoolName;
+        return grade || "-";
+      }
+
+      function updateCount() {
+        const count = studentListBody.querySelectorAll("tr").length;
+        studentCountBadge.textContent = count + "명";
+        statusText.textContent =
+          count === 0
+            ? "아직 추가된 학생이 없습니다."
+            : count + "명의 학생이 리스트에 있습니다.";
+      }
+
+      function clearFields() {
+        Object.values(fields).forEach((el) =>
+          el.tagName === "SELECT" ? (el.value = "") : (el.value = "")
+        );
+      }
+
+      function addStudentRow({
+        name,
+        parentPhone,
+        studentPhone,
+        highschoolName,
+        grade,
+        track,
+        gender,
+        password,
+      }) {
+        if (!name || !parentPhone || !password) return false;
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${name}</td>
+            <td>${parentPhone}</td>
+            <td>${studentPhone || "-"}</td>
+            <td>${makeSchoolGrade(highschoolName, grade)}</td>
+            <td>${track || "-"}</td>
+            <td>${gender || "-"}</td>
+            <td>${password ? "****" : "-"}</td>
+          `;
+        studentListBody.appendChild(tr);
+        return true;
+      }
+
+      // 개별 입력 → 추가
+      addButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        const name = fields.name.value.trim();
+        const parentPhone = fields.parentPhone.value.trim();
+        const studentPhone = fields.studentPhone.value.trim();
+        const highschoolName = fields.highschoolName.value.trim();
+        const grade = fields.grade.value;
+        const track = fields.track.value;
+        const gender = fields.gender.value;
+        const password = fields.password.value.trim();
+
+        if (!name || !parentPhone || !password) {
+          alert("이름 / 부모님 전화 / 비밀번호는 필수입니다.");
+          return;
+        }
+        const ok = addStudentRow({
+          name,
+          parentPhone,
+          studentPhone,
+          highschoolName,
+          grade,
+          track,
+          gender,
+          password,
         });
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('hidden');
-            sidebar.classList.toggle('absolute');
-            sidebar.classList.toggle('z-50');
-            sidebar.classList.toggle('h-full');
+        if (ok) {
+          updateCount();
+          clearFields();
         }
+      });
+
+      clearButton.addEventListener("click", clearFields);
+
+      // 붙여넣기 일괄 추가 (탭 또는 콤마 구분)
+      addBulkButton.addEventListener("click", function () {
+        const text = excelBulkInputArea.value.trim();
+        if (!text) return;
+        let cnt = 0,
+          failed = 0;
+        const lines = text.replace(/\r\n/g, "\n").split("\n");
+        for (let row of lines) {
+          if (!row.trim()) continue;
+          let cells = row.split("\t").map((x) => x.trim());
+          if (cells.length === 1) cells = row.split(",").map((x) => x.trim());
+
+          const [
+            name,
+            parentPhone,
+            studentPhone,
+            highschoolName,
+            grade,
+            track,
+            gender,
+            password,
+          ] = cells.map((s) => (s || "").trim());
+
+          if (!name || !parentPhone || !password) {
+            failed++;
+            continue;
+          }
+
+          addStudentRow({
+            name,
+            parentPhone,
+            studentPhone,
+            highschoolName,
+            grade,
+            track,
+            gender,
+            password,
+          });
+          cnt++;
+        }
+        updateCount();
+        alert(
+          `${cnt}명 추가${
+            failed ? ` / ${failed}명(형식 오류 또는 필수값 없음)` : ""
+          }`
+        );
+        excelBulkInputArea.value = "";
+      });
+
+      // 현재 테이블 데이터를 2차원 배열로 추출
+      function getTableData() {
+        return Array.from(studentListBody.children).map((tr) =>
+          Array.from(tr.children).map((td) => td.innerText)
+        );
+      }
+
+      // CSV / XLSX 다운로드
+      function downloadCSV(headers, data) {
+        let csv =
+          headers.join(",") +
+          "\r\n" +
+          data
+            .map((row) =>
+              row
+                .map((cell) => `"${(cell || "").replace(/"/g, '""')}"`)
+                .join(",")
+            )
+            .join("\r\n");
+        const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "학생리스트.csv";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+
+      function downloadXLSX(headers, data) {
+        const ws = XLSX.utils.aoa_to_sheet([headers, ...data]);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "학생리스트");
+        XLSX.writeFile(wb, "학생리스트.xlsx");
+      }
+
+      downloadCsvBtn.addEventListener("click", function () {
+        const headers = [
+          "이름",
+          "부모",
+          "학생폰",
+          "학교/학년",
+          "계열",
+          "성별",
+          "비번",
+        ];
+        const data = getTableData();
+        downloadCSV(headers, data);
+      });
+
+      downloadXlsxBtn.addEventListener("click", function () {
+        const headers = [
+          "이름",
+          "부모",
+          "학생폰",
+          "학교/학년",
+          "계열",
+          "성별",
+          "비번",
+        ];
+        const data = getTableData();
+        downloadXLSX(headers, data);
+      });
+
+      // ✅ 엑셀 파일 업로드 → 자동 파싱 → 행 추가
+      excelFileInput.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          const data = new Uint8Array(evt.target.result);
+          const workbook = XLSX.read(data, { type: "array" });
+          const sheetName = workbook.SheetNames[0];
+          const sheet = workbook.Sheets[sheetName];
+
+          const rows = XLSX.utils.sheet_to_json(sheet, { defval: "" });
+
+          let cnt = 0;
+          rows.forEach((row) => {
+            const name =
+              row["학생 이름 (필수)"] || row["이름"] || row["name"] || "";
+            const parentPhone =
+              row["부모님 전화번호 (필수)."] ||
+              row["부모님 전화번호 (필수)"] ||
+              row["부모전화"] ||
+              row["부모"] ||
+              row["parent"] ||
+              "";
+            const studentPhone =
+              row["학생 전화번호 (선택)"] ||
+              row["학생전화"] ||
+              row["학생폰"] ||
+              row["student"] ||
+              "";
+            const highschoolName =
+              row["고등학교 이름 (선택)"] ||
+              row["학교"] ||
+              row["학교명"] ||
+              row["school"] ||
+              "";
+            const grade =
+              row["학년 (선택)"] || row["학년"] || row["grade"] || "";
+            const track =
+              row["계열 (선택)"] || row["계열"] || row["track"] || "";
+            const gender =
+              row["성별 (선택)"] || row["성별"] || row["gender"] || "";
+            const password =
+              row["초기 비밀번호 (필수)\n학생이 로그인 할 비밀번호입니다."] ||
+              row["초기 비밀번호 (필수)"] ||
+              row["비밀번호"] ||
+              row["비번"] ||
+              row["password"] ||
+              "";
+
+            if (!name || !parentPhone || !password) return;
+
+            const ok = addStudentRow({
+              name,
+              parentPhone,
+              studentPhone,
+              highschoolName,
+              grade,
+              track,
+              gender,
+              password,
+            });
+            if (ok) cnt++;
+          });
+
+          updateCount();
+          alert(cnt + "명 엑셀에서 추가 완료");
+          excelFileInput.value = "";
+        };
+
+        reader.readAsArrayBuffer(file);
+      });
+
+      updateCount();
     </script>
-</body>
+  </body>
 </html>
